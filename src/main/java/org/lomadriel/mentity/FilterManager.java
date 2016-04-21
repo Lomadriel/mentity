@@ -72,8 +72,4 @@ class FilterManager {
 
 		this.filteredEntitySystem.put(filter, filteredSystems);
 	}
-
-	void reset() {
-		this.filteredEntitySystem.clear();
-	}
 }

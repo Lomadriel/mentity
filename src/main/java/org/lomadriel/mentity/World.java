@@ -73,7 +73,7 @@ public class World implements EntityListener, Serializable {
 	public void reset() {
 		this.entityManager.reset();
 		this.componentManager.reset();
-		this.filterManager.reset();
+		this.hasToBeFlushed = true;
 	}
 
 	/**
