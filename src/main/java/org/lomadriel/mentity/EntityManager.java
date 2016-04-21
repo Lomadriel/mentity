@@ -37,9 +37,9 @@ class EntityManager implements Serializable {
 	private static final long serialVersionUID = 2007045073473283304L;
 
 	private final BitSet entities = new BitSet();
-	private transient final BitSet removeQueue = new BitSet();
+	private final transient BitSet removeQueue = new BitSet();
 
-	private transient int nextIndex = 0;
+	private transient int nextIndex;
 	private transient int tempNextIndex = Integer.MAX_VALUE;
 
 	EntityManager() {
@@ -47,7 +47,7 @@ class EntityManager implements Serializable {
 	}
 
 	/**
-	 * Creates a new entity
+	 * Creates a new entity.
 	 *
 	 * @return the new entity.
 	 */
@@ -61,6 +61,11 @@ class EntityManager implements Serializable {
 		return entity;
 	}
 
+	/**
+	 * Destroys an entity.
+	 *
+	 * @param entity entity to destroy.
+	 */
 	void destroyEntity(int entity) {
 		this.removeQueue.set(entity);
 		EventDispatcher.getInstance().fire(new EntityEvent(EntityEvent.Type.DESTROYED, entity));
@@ -70,6 +75,11 @@ class EntityManager implements Serializable {
 		}
 	}
 
+	/**
+	 * Returns entities.
+	 *
+	 * @return a {@code BitSet} containing the entities.
+	 */
 	BitSet getEntities() {
 		return this.entities;
 	}
