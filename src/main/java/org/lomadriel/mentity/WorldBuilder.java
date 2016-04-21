@@ -118,7 +118,7 @@ public class WorldBuilder {
 	 */
 	public World toWorld() {
 		Set<System> systems = this.systems.stream()
-				.map(system -> system.system)
+				.map(node -> node.system)
 				.collect(Collectors.toCollection(LinkedHashSet::new));
 
 		return new World(systems);
