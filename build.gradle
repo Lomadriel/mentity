@@ -1,0 +1,31 @@
+group 'org.lomadriel'
+version '0.3.0'
+
+apply plugin: 'java'
+apply plugin: 'idea'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+
+    maven { url "https://jitpack.io" }
+}
+
+dependencies {
+    compile 'com.github.Lomadriel:LFC:b73f25852d'
+
+    testCompile group: 'junit', name: 'junit', version: '4.11'
+}
+
+idea {
+    project {
+        languageLevel = '1.8'
+    }
+
+    module {
+        downloadJavadoc = true // defaults to false
+        downloadSources = true
+    }
+}
