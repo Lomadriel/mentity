@@ -81,7 +81,7 @@ class EntityManager implements Serializable {
 	 * @return a {@code BitSet} containing the entities.
 	 */
 	BitSet getEntities() {
-		return this.entities;
+		return (BitSet) this.entities.clone();
 	}
 
 	/**

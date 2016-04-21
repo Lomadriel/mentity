@@ -164,7 +164,7 @@ public class World implements EntityListener, Serializable {
 	 * @return the entites.
 	 */
 	public BitSet getEntities() {
-		return (BitSet) this.entityManager.getEntities().clone();
+		return this.entityManager.getEntities();
 	}
 
 	void registerFilteredEntitySystem(FilteredSystem filteredEntitySystem) {
