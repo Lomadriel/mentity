@@ -67,8 +67,8 @@ public class Filter implements Serializable {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
 		Filter filter = (Filter) o;
-		return Objects.equals(this.requiredComponents, filter.requiredComponents) &&
-				Objects.equals(this.excludedComponents, filter.excludedComponents);
+		return this.requiredComponents.equals(filter.requiredComponents) &&
+				this.excludedComponents.equals(filter.excludedComponents);
 	}
 
 	@Override

@@ -69,7 +69,7 @@ public class WorldBuilder {
 			if (this == o) return true;
 			if (o == null || getClass() != o.getClass()) return false;
 			Node node = (Node) o;
-			return Objects.equals(this.system, node.system) &&
+			return this.system.equals(node.system) &&
 					this.priority == node.priority;
 		}
 
@@ -121,7 +121,7 @@ public class WorldBuilder {
 	 */
 	public World toWorld() {
 		Set<System> systems = this.systems.stream()
-				.map(system -> system.system)
+				.map(node -> node.system)
 				.collect(Collectors.toCollection(LinkedHashSet::new));
 
 		return new World(systems);
