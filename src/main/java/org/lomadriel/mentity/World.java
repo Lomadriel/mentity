@@ -38,7 +38,7 @@ public class World implements EntityListener, Serializable {
 
 	private final EntityManager entityManager = new EntityManager();
 	private final ComponentManager componentManager = new ComponentManager();
-	private transient final FilterManager filterManager = new FilterManager(this);
+	private transient final FilteredSystemManager filteredSystemManager = new FilteredSystemManager(this);
 	private final Set<System> systems = new HashSet<>();
 	private transient boolean hasToBeFlushed = true;
 
@@ -71,7 +71,7 @@ public class World implements EntityListener, Serializable {
 	public void reset() {
 		this.entityManager.reset();
 		this.componentManager.reset();
-		this.filterManager.reset();
+		this.filteredSystemManager.reset();
 	}
 
 	/**
@@ -166,14 +166,14 @@ public class World implements EntityListener, Serializable {
 	}
 
 	void registerFilteredEntitySystem(FilteredSystem filteredEntitySystem) {
-		this.filterManager.register(filteredEntitySystem);
+		this.filteredSystemManager.register(filteredEntitySystem);
 	}
 
 	private void flush() {
 		if (this.hasToBeFlushed) {
 			this.entityManager.flush();
 			this.componentManager.flush();
-			this.filterManager.updateAll(); // FIXME: updateAll when (an entity)/(a component) is added.
+			this.filteredSystemManager.updateAll(); // FIXME: updateAll when (an entity)/(a component) is added.
 			this.hasToBeFlushed = false;
 		}
 	}

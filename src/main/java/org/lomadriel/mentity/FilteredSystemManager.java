@@ -34,11 +34,11 @@ import java.util.Map;
  * @author Jérôme BOULMIER
  * @since 0.2
  */
-class FilterManager {
+class FilteredSystemManager {
 	private final WeakReference<World> world;
 	private final Map<Filter, List<FilteredSystem>> filteredEntitySystem = new HashMap<>();
 
-	FilterManager(World world) {
+	FilteredSystemManager(World world) {
 		this.world = new WeakReference<>(world);
 	}
 
