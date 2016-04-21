@@ -105,6 +105,9 @@ class ComponentManager implements Serializable {
 		}
 	}
 
+	/**
+	 * Removes all the components.
+	 */
 	public void reset() {
 		this.mappers.clear();
 	}

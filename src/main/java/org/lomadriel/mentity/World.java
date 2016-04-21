@@ -38,7 +38,7 @@ public class World implements EntityListener, Serializable {
 
 	private final EntityManager entityManager = new EntityManager();
 	private final ComponentManager componentManager = new ComponentManager();
-	private transient final FilterManager filterManager = new FilterManager(this);
+	private final transient FilterManager filterManager = new FilterManager(this);
 	private final Set<System> systems = new HashSet<>();
 	private transient boolean hasToBeFlushed = true;
 
@@ -56,7 +56,9 @@ public class World implements EntityListener, Serializable {
 	}
 
 	/**
-	 * Updates the systems using the priority order.
+	 * Updates the systems using the order of the builder.
+	 *
+	 * @see WorldBuilder
 	 */
 	public void update() {
 		for (System system : this.systems) {
@@ -66,7 +68,7 @@ public class World implements EntityListener, Serializable {
 	}
 
 	/**
-	 * Clears all the entities.
+	 * Clears all the entities and deletes all components.
 	 */
 	public void reset() {
 		this.entityManager.reset();
@@ -111,7 +113,7 @@ public class World implements EntityListener, Serializable {
 	 * @param entity         an entity
 	 * @param componentClass component's class
 	 * @param <T>            component's class
-	 * @return Return {@code true} if the given {@code entity} has the given component.
+	 * @return {@code true} if the given {@code entity} has the given component, false otherwise.
 	 */
 	public <T extends Component> boolean hasComponent(int entity, Class<T> componentClass) {
 		return this.componentManager.hasComponent(entity, componentClass);
@@ -135,7 +137,7 @@ public class World implements EntityListener, Serializable {
 	 *
 	 * @param positionComponentClass component's class
 	 * @param <T>                    component's class
-	 * @return Returns the component mapper of the given {@code component}.
+	 * @return the component mapper of the given {@code component}.
 	 */
 	public <T extends Component> ComponentMapper<T> getMapper(Class<T> positionComponentClass) {
 		return this.componentManager.getMapper(positionComponentClass);

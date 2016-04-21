@@ -42,6 +42,11 @@ class EntityManager implements Serializable {
 
 	}
 
+	/**
+	 * Creates a new entity
+	 *
+	 * @return the new entity.
+	 */
 	int createEntity() {
 		int entity = this.entities.nextClearBit(0);
 		this.entities.set(entity);
@@ -58,6 +63,9 @@ class EntityManager implements Serializable {
 		return this.entities;
 	}
 
+	/**
+	 * Deletes all entities.
+	 */
 	void reset() {
 		this.entities.clear();
 		this.removeQueue.clear();

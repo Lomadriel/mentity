@@ -37,6 +37,9 @@ import java.util.stream.Collectors;
  * @since 0.1
  */
 public class WorldBuilder {
+	/**
+	 * Priority of a system.
+	 */
 	public enum Priority {
 		LOWEST,
 		LOWER,
