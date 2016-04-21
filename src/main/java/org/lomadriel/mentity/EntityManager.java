@@ -30,6 +30,7 @@ import java.util.BitSet;
  * Class used to manage entities.
  *
  * @author Jérôme BOULMIER
+ * @author Benoît CORTIER
  * @since 0.1
  */
 class EntityManager implements Serializable {
@@ -37,6 +38,9 @@ class EntityManager implements Serializable {
 
 	private final BitSet entities = new BitSet();
 	private transient final BitSet removeQueue = new BitSet();
+
+	private transient int nextIndex = 0;
+	private transient int tempNextIndex = Integer.MAX_VALUE;
 
 	EntityManager() {
 
@@ -48,15 +52,22 @@ class EntityManager implements Serializable {
 	 * @return the new entity.
 	 */
 	int createEntity() {
-		int entity = this.entities.nextClearBit(0);
+		int entity = this.entities.nextClearBit(this.nextIndex);
 		this.entities.set(entity);
 		EventDispatcher.getInstance().fire(new EntityEvent(EntityEvent.Type.CREATED, entity));
+
+		this.nextIndex = entity + 1;
+
 		return entity;
 	}
 
 	void destroyEntity(int entity) {
 		this.removeQueue.set(entity);
 		EventDispatcher.getInstance().fire(new EntityEvent(EntityEvent.Type.DESTROYED, entity));
+
+		if (entity < this.tempNextIndex) {
+			this.tempNextIndex = entity;
+		}
 	}
 
 	BitSet getEntities() {
@@ -74,5 +85,10 @@ class EntityManager implements Serializable {
 	void flush() {
 		this.entities.andNot(this.removeQueue);
 		this.removeQueue.clear();
+
+		if (this.nextIndex > this.tempNextIndex) {
+			this.nextIndex = this.tempNextIndex;
+			this.tempNextIndex = Integer.MAX_VALUE;
+		}
 	}
 }
