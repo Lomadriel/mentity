@@ -66,7 +66,7 @@ public class WorldBuilder {
 			if (this == o) return true;
 			if (o == null || getClass() != o.getClass()) return false;
 			Node node = (Node) o;
-			return Objects.equals(this.system, node.system) &&
+			return this.system.equals(node.system) &&
 					this.priority == node.priority;
 		}
 
