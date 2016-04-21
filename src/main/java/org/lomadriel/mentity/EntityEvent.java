@@ -29,8 +29,11 @@ import org.lomadriel.lfc.event.Event;
  * @author Jérôme BOULMIER
  * @since 0.3
  */
-public class EntityEvent implements Event<EntityListener> {
-	public enum Type {
+public final class EntityEvent implements Event<EntityListener> {
+	/**
+	 * Event's type
+	 */
+	enum Type {
 		CREATED,
 		DESTROYED
 	}
