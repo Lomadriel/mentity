@@ -22,7 +22,6 @@
 package org.lomadriel.mentity;
 
 import java.util.LinkedHashSet;
-import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
@@ -30,7 +29,7 @@ import java.util.stream.Collectors;
 /**
  * Class used to build the world.
  * Each systems should be inserted into the world builder.
- * Theses systems are sorted by priority.
+ * Theses systems are sorted by priority and should be unique.
  *
  * @author Jérôme BOULMIER
  * @see Priority
@@ -87,6 +86,8 @@ public class WorldBuilder {
 	 *
 	 * @param system a system to add with the default priority.
 	 * @return itself
+	 * @throws NullPointerException     if the system or the priority is null.
+	 * @throws IllegalArgumentException if the system is already in this builder.
 	 */
 	public WorldBuilder addSystem(System system) {
 		return addSystem(system, Priority.DEFAULT);
@@ -99,6 +100,8 @@ public class WorldBuilder {
 	 * @param system   a system
 	 * @param priority system's priority
 	 * @return itself
+	 * @throws NullPointerException     if the system or the priority is null.
+	 * @throws IllegalArgumentException if the system is already in this builder.
 	 */
 	public WorldBuilder addSystem(System system, Priority priority) {
 		if (system == null) {
@@ -107,6 +110,14 @@ public class WorldBuilder {
 
 		if (priority == null) {
 			throw new NullPointerException("Priority can't be null");
+		}
+
+		Class<? extends System> systemClass = system.getClass();
+
+		for (Node node : this.systems) {
+			if (node.system.getClass() == systemClass) {
+				throw new IllegalArgumentException(systemClass.getName() + " is already in this builder.");
+			}
 		}
 
 		this.systems.add(new Node(system, priority));
