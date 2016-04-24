@@ -62,20 +62,6 @@ public class WorldBuilder {
 		public int compareTo(Node o) {
 			return this.priority.ordinal() - o.priority.ordinal();
 		}
-
-		@Override
-		public boolean equals(Object o) {
-			if (this == o) return true;
-			if (o == null || getClass() != o.getClass()) return false;
-			Node node = (Node) o;
-			return this.system.equals(node.system) &&
-					this.priority == node.priority;
-		}
-
-		@Override
-		public int hashCode() {
-			return Objects.hash(this.system, this.priority);
-		}
 	}
 
 	private final Set<Node> systems = new TreeSet<>();
