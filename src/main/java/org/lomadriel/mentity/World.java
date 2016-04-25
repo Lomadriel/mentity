@@ -23,7 +23,6 @@ package org.lomadriel.mentity;
 
 import java.io.Serializable;
 import java.util.BitSet;
-import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -39,11 +38,11 @@ public class World implements EntityListener, Serializable {
 	private final EntityManager entityManager = new EntityManager();
 	private final ComponentManager componentManager = new ComponentManager();
 	private final transient FilteredSystemManager filteredSystemManager = new FilteredSystemManager(this);
-	private final Set<System> systems = new HashSet<>();
+	private final System[] systems;
 	private transient boolean hasToBeFlushed = true;
 
 	World(Set<System> systems) {
-		this.systems.addAll(systems);
+		this.systems = systems.toArray(new System[systems.size()]);
 
 		for (System system : systems) {
 			system.setWorld(this);
