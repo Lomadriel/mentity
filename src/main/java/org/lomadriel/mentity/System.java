@@ -33,10 +33,14 @@ import java.lang.ref.WeakReference;
 public abstract class System implements Serializable {
 	private static final long serialVersionUID = 4814147056473193164L;
 
-	protected transient WeakReference<World> world;
+	private transient WeakReference<World> world;
 
 	void setWorld(World world) {
 		this.world = new WeakReference<>(world);
+	}
+
+	protected World getWorld() {
+		return this.world.get();
 	}
 
 	/**

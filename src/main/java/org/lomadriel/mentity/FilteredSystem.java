@@ -48,7 +48,7 @@ public abstract class FilteredSystem extends System {
 	@Override
 	protected final void setup() {
 		super.setup();
-		this.world.get().registerFilteredEntitySystem(this);
+		getWorld().registerFilteredEntitySystem(this);
 	}
 
 	@Override
