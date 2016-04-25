@@ -104,6 +104,7 @@ public class World implements EntityListener, Serializable {
 	 */
 	public <T extends Component> void addComponent(int entity, Class<T> componentClass, T component) {
 		this.componentManager.addComponent(entity, componentClass, component);
+		this.hasToBeFlushed = true;
 	}
 
 	/**
@@ -129,6 +130,7 @@ public class World implements EntityListener, Serializable {
 	 */
 	public <T extends Component> void removeComponent(int entity, Class<T> componentClass) {
 		this.componentManager.removeComponent(entity, componentClass);
+		this.hasToBeFlushed = true;
 	}
 
 	/**
@@ -147,6 +149,7 @@ public class World implements EntityListener, Serializable {
 	 */
 	@Override
 	public void handleNewEntity(int entity) {
+		this.hasToBeFlushed = true;
 	}
 
 	/**
@@ -174,7 +177,7 @@ public class World implements EntityListener, Serializable {
 		if (this.hasToBeFlushed) {
 			this.entityManager.flush();
 			this.componentManager.flush();
-			this.filteredSystemManager.updateAll(); // FIXME: updateAll when (an entity)/(a component) is added.
+			this.filteredSystemManager.updateAll();
 			this.hasToBeFlushed = false;
 		}
 	}
