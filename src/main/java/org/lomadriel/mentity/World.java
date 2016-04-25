@@ -34,6 +34,7 @@ import java.util.Set;
  */
 public class World implements EntityListener, Serializable {
 	private static final long serialVersionUID = 3335361230408407617L;
+	private static final String ENTITY_DOES_NOT_EXIST_MSG = "This entity doesn't exist";
 
 	private final EntityManager entityManager = new EntityManager();
 	private final ComponentManager componentManager = new ComponentManager();
@@ -101,8 +102,14 @@ public class World implements EntityListener, Serializable {
 	 * @param componentClass component's class
 	 * @param component      component to add.
 	 * @param <T>            component's class
+	 * @throws IllegalArgumentException if the entity doesn't exist.
+	 * @throws NullPointerException     if the component is null.
 	 */
 	public <T extends Component> void addComponent(int entity, Class<T> componentClass, T component) {
+		if (!this.entityManager.entityExists(entity)) {
+			throw new IllegalArgumentException(ENTITY_DOES_NOT_EXIST_MSG);
+		}
+
 		this.componentManager.addComponent(entity, componentClass, component);
 		this.hasToBeFlushed = true;
 	}
@@ -114,8 +121,13 @@ public class World implements EntityListener, Serializable {
 	 * @param componentClass component's class
 	 * @param <T>            component's class
 	 * @return {@code true} if the given {@code entity} has the given component, false otherwise.
+	 * @throws IllegalArgumentException if the entity doesn't exist.
 	 */
 	public <T extends Component> boolean hasComponent(int entity, Class<T> componentClass) {
+		if (!this.entityManager.entityExists(entity)) {
+			throw new IllegalArgumentException(ENTITY_DOES_NOT_EXIST_MSG);
+		}
+
 		return this.componentManager.hasComponent(entity, componentClass);
 	}
 
@@ -127,8 +139,13 @@ public class World implements EntityListener, Serializable {
 	 * @param entity         an entity
 	 * @param componentClass component's class
 	 * @param <T>            component's class
+	 * @throws IllegalArgumentException if the entity doesn't exist.
 	 */
 	public <T extends Component> void removeComponent(int entity, Class<T> componentClass) {
+		if (!this.entityManager.entityExists(entity)) {
+			throw new IllegalArgumentException(ENTITY_DOES_NOT_EXIST_MSG);
+		}
+
 		this.componentManager.removeComponent(entity, componentClass);
 		this.hasToBeFlushed = true;
 	}

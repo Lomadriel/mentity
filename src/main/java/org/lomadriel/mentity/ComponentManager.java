@@ -64,6 +64,7 @@ class ComponentManager implements Serializable {
 	 * @param componentClass component's class
 	 * @param component      component
 	 * @param <T>            type of the component.
+	 * @throws NullPointerException if the component is null.
 	 */
 	<T extends Component> void addComponent(int entity, Class<T> componentClass, T component) {
 		getMapper(componentClass).addComponent(entity, component);

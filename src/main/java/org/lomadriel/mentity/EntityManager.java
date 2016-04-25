@@ -62,6 +62,16 @@ class EntityManager implements Serializable {
 	}
 
 	/**
+	 * Checks the existence of an entity
+	 *
+	 * @param entity entity to check the existence
+	 * @return {@code true} if the entity exists, {@code false} otherwise.
+	 */
+	boolean entityExists(int entity) {
+		return this.entities.get(entity);
+	}
+
+	/**
 	 * Destroys an entity.
 	 *
 	 * @param entity entity to destroy.

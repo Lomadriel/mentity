@@ -76,7 +76,6 @@ public class ComponentMapper<T extends Component> implements Serializable {
 	 * @throws NullPointerException if the component is null.
 	 */
 	public void addComponent(int entity, T component) {
-		// TODO: Throws exception if the entity doesn't exist.
 		assert (entity >= 0);
 
 		// throws NullPointerException since TreeMap doesn't allow null value.
@@ -91,7 +90,6 @@ public class ComponentMapper<T extends Component> implements Serializable {
 	 * @param entity an existing entity.
 	 */
 	public void removeComponent(int entity) {
-		// TODO: Throws exception if the entity doesn't exist.
 		assert (entity >= 0);
 
 		this.removeQueue.set(entity);
