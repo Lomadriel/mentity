@@ -22,6 +22,7 @@
 package org.lomadriel.mentity;
 
 import java.util.LinkedHashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
@@ -61,6 +62,20 @@ public class WorldBuilder {
 		@Override
 		public int compareTo(Node o) {
 			return this.priority.ordinal() - o.priority.ordinal();
+		}
+
+		@Override
+		public boolean equals(Object o) {
+			if (this == o) return true;
+			if (o == null || getClass() != o.getClass()) return false;
+			Node node = (Node) o;
+			return this.system.equals(node.system) &&
+					this.priority == node.priority;
+		}
+
+		@Override
+		public int hashCode() {
+			return Objects.hash(this.system, this.priority);
 		}
 	}
 
