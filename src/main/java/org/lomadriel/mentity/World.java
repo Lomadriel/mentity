@@ -97,6 +97,7 @@ public class World implements EntityListener, Serializable {
 
 		this.entityManager.destroyEntity(entity);
 		this.componentManager.removeComponents(entity);
+		this.hasToBeFlushed = true;
 	}
 
 	/**
