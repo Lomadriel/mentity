@@ -97,7 +97,7 @@ class ComponentManager implements Serializable {
 	 * Removes all the components of the given {@code entity}.
 	 * Components are removed at the end of the iteration.
 	 *
-	 * @param entity
+	 * @param entity an existing entity
 	 */
 	public void removeComponents(int entity) {
 		for (Class<? extends Component> componentClass : this.mappers.keySet()) {
