@@ -91,6 +91,10 @@ public class World implements EntityListener, Serializable {
 	 * @param entity an entity
 	 */
 	public void destroyEntity(int entity) {
+		if (!this.entityManager.entityExists(entity)) {
+			return;
+		}
+
 		this.entityManager.destroyEntity(entity);
 		this.componentManager.removeComponents(entity);
 	}
