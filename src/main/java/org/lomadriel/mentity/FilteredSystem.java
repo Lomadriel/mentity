@@ -76,4 +76,14 @@ public abstract class FilteredSystem extends System {
 	public Filter getFilter() {
 		return this.filter;
 	}
+
+	/**
+	 * Returns true if the given {@code entity} is in this system.
+	 *
+	 * @param entity an entity
+	 * @return {@code true} if the given {@code entity} is in this system.
+	 */
+	public final boolean isInThisSystem(int entity) {
+		return this.entities.get(entity);
+	}
 }
