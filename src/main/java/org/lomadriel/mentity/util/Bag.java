@@ -26,7 +26,13 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
-public final class Bag<E> implements Serializable {
+/**
+ * Auto-resizable array.
+ *
+ * @param <E> type of the elements in this list.
+ * @since 0.4.0
+ */
+public class Bag<E> implements Serializable {
 	private static final long serialVersionUID = 3314881599845413840L;
 
 	/**
