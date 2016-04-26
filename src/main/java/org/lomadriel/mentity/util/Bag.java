@@ -34,7 +34,7 @@ public final class Bag<E> implements Serializable {
 	 * {@link #writeObject(ObjectOutputStream)} and {@link #readObject(ObjectInputStream)}
 	 */
 	private transient E[] elements;
-	private transient int highestElement;
+	private int highestElement;
 
 	public Bag() {
 		this(16);
@@ -84,7 +84,6 @@ public final class Bag<E> implements Serializable {
 	/**
 	 * Clears the collection.
 	 */
-
 	public void clear() {
 		for (int i = 0; i < Math.max(this.elements.length, this.highestElement); ++i) {
 			this.elements[i] = null;
@@ -93,6 +92,7 @@ public final class Bag<E> implements Serializable {
 
 	private void ensureCapacity(int index) {
 		if (index >= this.elements.length) {
+			// It might be more interresting to double the array length rather than compute the next power of two.
 			int newCapacity = Bag.nextPowerOfTwo(index + 1);
 			@SuppressWarnings("unchecked") E[] elements = (E[]) new Object[newCapacity];
 			System.arraycopy(this.elements, 0, elements, 0, this.elements.length);
@@ -103,10 +103,8 @@ public final class Bag<E> implements Serializable {
 	private void writeObject(ObjectOutputStream stream) throws IOException {
 		stream.defaultWriteObject();
 
-		stream.writeInt(this.elements.length);
-
-		for (E element : this.elements) {
-			stream.writeObject(element);
+		for (int i = 0; i < this.highestElement; i++) {
+			stream.writeObject(this.elements[i]);
 		}
 	}
 
@@ -114,11 +112,9 @@ public final class Bag<E> implements Serializable {
 	private void readObject(ObjectInputStream stream) throws IOException, ClassNotFoundException {
 		stream.defaultReadObject();
 
-		int length = stream.readInt();
+		ensureCapacity(this.highestElement);
 
-		this.elements = (E[]) new Object[length];
-
-		for (int i = 0; i < length; i++) {
+		for (int i = 0; i < this.highestElement; i++) {
 			this.elements[i] = (E) stream.readObject();
 		}
 
