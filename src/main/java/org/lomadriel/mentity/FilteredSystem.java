@@ -48,17 +48,33 @@ public abstract class FilteredSystem extends System {
 	@Override
 	protected final void setup() {
 		super.setup();
-		this.world.get().registerFilteredEntitySystem(this);
+		getWorld().registerFilteredEntitySystem(this);
+	}
+
+	/**
+	 * Overrides this method to execute code before each update.
+	 */
+	protected void beforeUpdate() {
 	}
 
 	@Override
 	protected final void update() {
+		beforeUpdate();
+
 		int entity = this.entities.nextSetBit(0);
 		while (entity != -1) {
 			update(entity);
 
 			entity = this.entities.nextSetBit(entity + 1);
 		}
+
+		afterUpdate();
+	}
+
+	/**
+	 * Overrides this method to execute code after each update.
+	 */
+	protected void afterUpdate() {
 	}
 
 	/**
@@ -75,5 +91,15 @@ public abstract class FilteredSystem extends System {
 	 */
 	public Filter getFilter() {
 		return this.filter;
+	}
+
+	/**
+	 * Returns true if the given {@code entity} is in this system.
+	 *
+	 * @param entity an entity
+	 * @return {@code true} if the given {@code entity} is in this system.
+	 */
+	public final boolean isInThisSystem(int entity) {
+		return this.entities.get(entity);
 	}
 }

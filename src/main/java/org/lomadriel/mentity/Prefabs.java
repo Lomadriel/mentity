@@ -21,18 +21,18 @@
 
 package org.lomadriel.mentity;
 
-import java.io.Serializable;
-
 /**
- * Component are data class.
- * Extends this class to define a new component.
- * Logic should be in a {@code System} or a {@code FilteredSystem}.
+ * Class used to build a new entity with several components.
  *
  * @author Jérôme BOULMIER
- * @see FilteredSystem
- * @see System
- * @since 0.1
+ * @since 0.9.0
  */
-public abstract class Component implements Serializable {
-	private static final long serialVersionUID = 7657325065672262186L;
+public interface Prefabs {
+	/**
+	 * Invoked when an entity is built with this prefabs. {@link World#createEntity(Prefabs)}
+	 *
+	 * @param world  world in which the entity is built.
+	 * @param entity entity id.
+	 */
+	void initialize(World world, int entity);
 }

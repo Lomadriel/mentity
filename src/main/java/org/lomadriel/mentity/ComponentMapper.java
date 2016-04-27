@@ -21,10 +21,10 @@
 
 package org.lomadriel.mentity;
 
+import org.lomadriel.mentity.util.Bag;
+
 import java.io.Serializable;
 import java.util.BitSet;
-import java.util.Map;
-import java.util.TreeMap;
 
 /**
  * Class used to manage the components.
@@ -36,7 +36,7 @@ import java.util.TreeMap;
 public class ComponentMapper<T extends Component> implements Serializable {
 	private static final long serialVersionUID = 494271719946187185L;
 
-	private final Map<Integer, T> components = new TreeMap<>();
+	private final Bag<T> components = new Bag<>();
 	private final transient BitSet componentsBitSet = new BitSet(); // No need to serialize this.
 	private final transient BitSet removeQueue = new BitSet();
 
@@ -44,16 +44,21 @@ public class ComponentMapper<T extends Component> implements Serializable {
 	}
 
 	/**
-	 * Returns the component of the given {@code entity}.
+	 * Adds the given component to the given entity.
 	 *
-	 * @param entity an entity
-	 * @return the component if the entity has it, null otherwise.
+	 * @param entity    an existing entity.
+	 * @param component a component.
+	 * @throws NullPointerException if the component is null.
 	 */
-	public T getComponent(int entity) {
+	public void addComponent(int entity, T component) {
 		assert (entity >= 0);
-		assert (hasComponent(entity)) : "Useless call to getComponent(int entity)";
 
-		return this.components.get(new Integer(entity));
+		if (component == null) {
+			throw new NullPointerException("Component can't be null");
+		}
+
+		this.components.set(entity, component);
+		this.componentsBitSet.set(entity);
 	}
 
 	/**
@@ -69,19 +74,16 @@ public class ComponentMapper<T extends Component> implements Serializable {
 	}
 
 	/**
-	 * Adds the given component to the given entity.
+	 * Returns the component of the given {@code entity}.
 	 *
-	 * @param entity    an existing entity.
-	 * @param component a component.
-	 * @throws NullPointerException if the component is null.
+	 * @param entity an entity
+	 * @return the component if the entity has it, null otherwise.
 	 */
-	public void addComponent(int entity, T component) {
-		// TODO: Throws exception if the entity doesn't exist.
+	public T getComponent(int entity) {
 		assert (entity >= 0);
+		assert (hasComponent(entity)) : "Useless call to getComponent(int entity)";
 
-		// throws NullPointerException since TreeMap doesn't allow null value.
-		this.components.put(new Integer(entity), component);
-		this.componentsBitSet.set(entity);
+		return this.components.get(entity);
 	}
 
 	/**
@@ -91,7 +93,6 @@ public class ComponentMapper<T extends Component> implements Serializable {
 	 * @param entity an existing entity.
 	 */
 	public void removeComponent(int entity) {
-		// TODO: Throws exception if the entity doesn't exist.
 		assert (entity >= 0);
 
 		this.removeQueue.set(entity);
@@ -109,7 +110,7 @@ public class ComponentMapper<T extends Component> implements Serializable {
 	void flush() {
 		this.componentsBitSet.andNot(this.removeQueue);
 		for (int i = this.removeQueue.nextSetBit(0); i != -1; i = this.removeQueue.nextSetBit(i + 1)) {
-			this.components.remove(new Integer(i));
+			this.components.set(i, null);
 		}
 
 		this.removeQueue.clear();

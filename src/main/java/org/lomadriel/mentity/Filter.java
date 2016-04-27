@@ -38,6 +38,16 @@ public class Filter implements Serializable {
 	private final Set<Class<? extends Component>> requiredComponents = new HashSet<>();
 	private final Set<Class<? extends Component>> excludedComponents = new HashSet<>();
 
+	public Filter(Class<? extends Component> requiredComponent) {
+		this.requiredComponents.add(requiredComponent);
+	}
+
+	public Filter(Class<? extends Component> requiredComponent,
+	              Class<? extends Component> excludedComponent) {
+		this.requiredComponents.add(requiredComponent);
+		this.excludedComponents.add(excludedComponent);
+	}
+
 	public Filter(Set<Class<? extends Component>> requiredComponents) {
 		this.requiredComponents.addAll(requiredComponents);
 	}

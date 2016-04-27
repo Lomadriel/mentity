@@ -23,7 +23,6 @@ package org.lomadriel.mentity;
 
 import java.io.Serializable;
 import java.util.BitSet;
-import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -35,15 +34,16 @@ import java.util.Set;
  */
 public class World implements EntityListener, Serializable {
 	private static final long serialVersionUID = 3335361230408407617L;
+	private static final String ENTITY_DOES_NOT_EXIST_MSG = "This entity doesn't exist";
 
 	private final EntityManager entityManager = new EntityManager();
 	private final ComponentManager componentManager = new ComponentManager();
 	private final transient FilteredSystemManager filteredSystemManager = new FilteredSystemManager(this);
-	private final Set<System> systems = new HashSet<>();
+	private final System[] systems;
 	private transient boolean hasToBeFlushed = true;
 
 	World(Set<System> systems) {
-		this.systems.addAll(systems);
+		this.systems = systems.toArray(new System[systems.size()]);
 
 		for (System system : systems) {
 			system.setWorld(this);
@@ -86,13 +86,32 @@ public class World implements EntityListener, Serializable {
 	}
 
 	/**
+	 * Creates a new entity using the given {@code prefabs}
+	 *
+	 * @param prefabs prefabs used to build the new entity.
+	 * @return the new entity.
+	 */
+	public int createEntity(Prefabs prefabs) {
+		int entity = createEntity();
+
+		prefabs.initialize(this, entity);
+
+		return entity;
+	}
+
+	/**
 	 * Destroys the given {@code entity}.
 	 *
 	 * @param entity an entity
 	 */
 	public void destroyEntity(int entity) {
+		if (!this.entityManager.entityExists(entity)) {
+			return;
+		}
+
 		this.entityManager.destroyEntity(entity);
 		this.componentManager.removeComponents(entity);
+		this.hasToBeFlushed = true;
 	}
 
 	/**
@@ -102,9 +121,16 @@ public class World implements EntityListener, Serializable {
 	 * @param componentClass component's class
 	 * @param component      component to add.
 	 * @param <T>            component's class
+	 * @throws IllegalArgumentException if the entity doesn't exist.
+	 * @throws NullPointerException     if the component is null.
 	 */
 	public <T extends Component> void addComponent(int entity, Class<T> componentClass, T component) {
+		if (!this.entityManager.entityExists(entity)) {
+			throw new IllegalArgumentException(ENTITY_DOES_NOT_EXIST_MSG);
+		}
+
 		this.componentManager.addComponent(entity, componentClass, component);
+		this.hasToBeFlushed = true;
 	}
 
 	/**
@@ -114,8 +140,13 @@ public class World implements EntityListener, Serializable {
 	 * @param componentClass component's class
 	 * @param <T>            component's class
 	 * @return {@code true} if the given {@code entity} has the given component, false otherwise.
+	 * @throws IllegalArgumentException if the entity doesn't exist.
 	 */
 	public <T extends Component> boolean hasComponent(int entity, Class<T> componentClass) {
+		if (!this.entityManager.entityExists(entity)) {
+			throw new IllegalArgumentException(ENTITY_DOES_NOT_EXIST_MSG);
+		}
+
 		return this.componentManager.hasComponent(entity, componentClass);
 	}
 
@@ -127,9 +158,15 @@ public class World implements EntityListener, Serializable {
 	 * @param entity         an entity
 	 * @param componentClass component's class
 	 * @param <T>            component's class
+	 * @throws IllegalArgumentException if the entity doesn't exist.
 	 */
 	public <T extends Component> void removeComponent(int entity, Class<T> componentClass) {
+		if (!this.entityManager.entityExists(entity)) {
+			throw new IllegalArgumentException(ENTITY_DOES_NOT_EXIST_MSG);
+		}
+
 		this.componentManager.removeComponent(entity, componentClass);
+		this.hasToBeFlushed = true;
 	}
 
 	/**
@@ -148,6 +185,7 @@ public class World implements EntityListener, Serializable {
 	 */
 	@Override
 	public void handleNewEntity(int entity) {
+		this.hasToBeFlushed = true;
 	}
 
 	/**
@@ -175,7 +213,7 @@ public class World implements EntityListener, Serializable {
 		if (this.hasToBeFlushed) {
 			this.entityManager.flush();
 			this.componentManager.flush();
-			this.filteredSystemManager.updateAll(); // FIXME: updateAll when (an entity)/(a component) is added.
+			this.filteredSystemManager.updateAll();
 			this.hasToBeFlushed = false;
 		}
 	}

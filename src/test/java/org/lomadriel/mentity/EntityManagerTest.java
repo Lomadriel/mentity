@@ -2,6 +2,7 @@ package org.lomadriel.mentity;
 
 import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 public class EntityManagerTest {
@@ -12,12 +13,15 @@ public class EntityManagerTest {
 		this.entityManager.reset();
 	}
 
-	@Test
-	public void addEntities() {
+	@Before
+	public void init() {
 		for (int i = 0; i < 64; i++) {
 			this.entityManager.createEntity();
 		}
+	}
 
+	@Test
+	public void addEntities() {
 		long[] entities = this.entityManager.getEntities().toLongArray();
 
 		Assert.assertEquals(1, entities.length);
@@ -26,10 +30,6 @@ public class EntityManagerTest {
 
 	@Test
 	public void cacheTest() {
-		for (int i = 0; i < 64; i++) {
-			this.entityManager.createEntity();
-		}
-
 		this.entityManager.destroyEntity(0);
 		this.entityManager.destroyEntity(1);
 		this.entityManager.flush();

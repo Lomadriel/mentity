@@ -46,7 +46,7 @@ class ComponentManager implements Serializable {
 	 * @param <T>            class of the component.
 	 * @return a mapper
 	 */
-	public <T extends Component> ComponentMapper<T> getMapper(Class<T> componentClass) {
+	<T extends Component> ComponentMapper<T> getMapper(Class<T> componentClass) {
 		@SuppressWarnings("unchecked")
 		ComponentMapper<T> mapper = (ComponentMapper<T>) this.mappers.get(componentClass);
 		if (mapper == null) {
@@ -64,8 +64,9 @@ class ComponentManager implements Serializable {
 	 * @param componentClass component's class
 	 * @param component      component
 	 * @param <T>            type of the component.
+	 * @throws NullPointerException if the component is null.
 	 */
-	public <T extends Component> void addComponent(int entity, Class<T> componentClass, T component) {
+	<T extends Component> void addComponent(int entity, Class<T> componentClass, T component) {
 		getMapper(componentClass).addComponent(entity, component);
 	}
 
@@ -77,7 +78,7 @@ class ComponentManager implements Serializable {
 	 * @param <T>            component's class
 	 * @return {@code true} if the given {@code entity} has the given component.
 	 */
-	public <T extends Component> boolean hasComponent(int entity, Class<T> componentClass) {
+	<T extends Component> boolean hasComponent(int entity, Class<T> componentClass) {
 		return getMapper(componentClass).hasComponent(entity);
 	}
 
@@ -89,7 +90,7 @@ class ComponentManager implements Serializable {
 	 * @param componentClass component's class
 	 * @param <T>            component's class
 	 */
-	public <T extends Component> void removeComponent(int entity, Class<T> componentClass) {
+	<T extends Component> void removeComponent(int entity, Class<T> componentClass) {
 		getMapper(componentClass).removeComponent(entity);
 	}
 
@@ -97,9 +98,9 @@ class ComponentManager implements Serializable {
 	 * Removes all the components of the given {@code entity}.
 	 * Components are removed at the end of the iteration.
 	 *
-	 * @param entity
+	 * @param entity an existing entity
 	 */
-	public void removeComponents(int entity) {
+	void removeComponents(int entity) {
 		for (Class<? extends Component> componentClass : this.mappers.keySet()) {
 			getMapper(componentClass).removeComponent(entity);
 		}
@@ -108,7 +109,7 @@ class ComponentManager implements Serializable {
 	/**
 	 * Removes all the components.
 	 */
-	public void reset() {
+	void reset() {
 		this.mappers.clear();
 	}
 
