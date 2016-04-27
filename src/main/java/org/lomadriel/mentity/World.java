@@ -86,6 +86,20 @@ public class World implements EntityListener, Serializable {
 	}
 
 	/**
+	 * Creates a new entity using the given {@code prefabs}
+	 *
+	 * @param prefabs prefabs used to build the new entity.
+	 * @return the new entity.
+	 */
+	public int createEntity(Prefabs prefabs) {
+		int entity = createEntity();
+
+		prefabs.initialize(this, entity);
+
+		return entity;
+	}
+
+	/**
 	 * Destroys the given {@code entity}.
 	 *
 	 * @param entity an entity
