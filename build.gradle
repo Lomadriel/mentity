@@ -1,5 +1,5 @@
 group 'org.lomadriel'
-version '0.3.0'
+version '0.9.0'
 
 apply plugin: 'java'
 apply plugin: 'idea'
@@ -14,7 +14,7 @@ repositories {
 }
 
 dependencies {
-    compile 'com.github.Lomadriel:LFC:b73f25852d'
+    compile 'com.github.Lomadriel:LFC:0.1.0'
 
     testCompile group: 'junit', name: 'junit', version: '4.11'
 }

@@ -25,6 +25,7 @@ package org.lomadriel.mentity;
  * Class used to build a new entity with several components.
  *
  * @author Jérôme BOULMIER
+ * @since 0.9.0
  */
 public interface Prefabs {
 	/**
