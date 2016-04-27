@@ -28,7 +28,7 @@ package org.lomadriel.mentity;
  */
 public interface Prefabs {
 	/**
-	 * Invoked when an entity is built with this prefabs.
+	 * Invoked when an entity is built with this prefabs. {@link World#createEntity(Prefabs)}
 	 *
 	 * @param world  world in which the entity is built.
 	 * @param entity entity id.
