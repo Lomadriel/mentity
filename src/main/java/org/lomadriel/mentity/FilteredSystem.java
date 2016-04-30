@@ -31,8 +31,6 @@ import java.util.BitSet;
  * @since 0.2
  */
 public abstract class FilteredSystem extends BaseSystem {
-	private static final long serialVersionUID = 424333379186904007L;
-
 	private final Filter filter;
 	transient BitSet entities;
 

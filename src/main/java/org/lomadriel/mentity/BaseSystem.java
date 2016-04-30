@@ -21,7 +21,6 @@
 
 package org.lomadriel.mentity;
 
-import java.io.Serializable;
 import java.lang.ref.WeakReference;
 
 /**
@@ -30,9 +29,7 @@ import java.lang.ref.WeakReference;
  * @author Jérôme BOULMIER
  * @since 0.1
  */
-public abstract class BaseSystem implements Serializable {
-	private static final long serialVersionUID = 4814147056473193164L;
-
+public abstract class BaseSystem {
 	private transient WeakReference<World> world;
 
 	void setWorld(World world) {
