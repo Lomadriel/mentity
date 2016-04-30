@@ -23,6 +23,8 @@ package org.lomadriel.mentity;
 
 import org.lomadriel.mentity.util.Bag;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.util.BitSet;
 
@@ -36,11 +38,22 @@ import java.util.BitSet;
 public class ComponentMapper<T extends Component> implements Serializable {
 	private static final long serialVersionUID = 494271719946187185L;
 
-	private final Bag<T> components = new Bag<>();
+	private final Bag<T> components;
 	private final transient BitSet componentsBitSet = new BitSet(); // No need to serialize this.
 	private final transient BitSet removeQueue = new BitSet();
 
 	ComponentMapper() {
+		this.components = new Bag<>();
+	}
+
+	private ComponentMapper(ComponentMapper copy) {
+		this.components = copy.components;
+
+		for (int i = 0; i < this.components.size(); i++) {
+			if (this.components.get(i) != null) {
+				this.componentsBitSet.set(i);
+			}
+		}
 	}
 
 	/**
@@ -62,10 +75,10 @@ public class ComponentMapper<T extends Component> implements Serializable {
 	}
 
 	/**
-	 * Returns true if the given entity have the component, false otherwise.
+	 * Returns true if the given entity has the component, false otherwise.
 	 *
 	 * @param entity an entity
-	 * @return Returns true if the entity have the component, false otherwise.
+	 * @return Returns true if the entity has the component, false otherwise.
 	 */
 	public boolean hasComponent(int entity) {
 		assert (entity >= 0);
@@ -114,5 +127,13 @@ public class ComponentMapper<T extends Component> implements Serializable {
 		}
 
 		this.removeQueue.clear();
+	}
+
+	private Object readResolve() {
+		return new ComponentMapper<>(this);
+	}
+
+	private void readObject(ObjectInputStream stream) throws IOException, ClassNotFoundException {
+		stream.defaultReadObject();
 	}
 }
