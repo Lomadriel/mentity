@@ -78,13 +78,14 @@ public class Bag<E> implements Serializable {
 			return;
 		}
 
-		ensureCapacity(index);
-
-		this.elements[index] = value;
-
 		if (index > this.highestElement) {
 			this.highestElement = index;
+
+			// if index < this.highestElement, there is no need to ensure the capacity.
+			ensureCapacity(index);
 		}
+
+		this.elements[index] = value;
 	}
 
 	/**
