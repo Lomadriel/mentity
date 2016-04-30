@@ -26,11 +26,11 @@ import java.io.Serializable;
 /**
  * Component are data class.
  * Extends this class to define a new component.
- * Logic should be in a {@code System} or a {@code FilteredSystem}.
+ * Logic should be in a {@code BaseSystem} or a {@code FilteredSystem}.
  *
  * @author Jérôme BOULMIER
  * @see FilteredSystem
- * @see System
+ * @see BaseSystem
  * @since 0.1
  */
 public abstract class Component implements Serializable {

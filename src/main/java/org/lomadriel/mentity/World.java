@@ -39,18 +39,18 @@ public class World implements EntityListener, Serializable {
 	private final EntityManager entityManager = new EntityManager();
 	private final ComponentManager componentManager = new ComponentManager();
 	private final transient FilteredSystemManager filteredSystemManager = new FilteredSystemManager(this);
-	private final System[] systems;
+	private final BaseSystem[] systems;
 	private transient boolean hasToBeFlushed = true;
 
-	World(Set<System> systems) {
-		this.systems = systems.toArray(new System[systems.size()]);
+	World(Set<BaseSystem> systems) {
+		this.systems = systems.toArray(new BaseSystem[systems.size()]);
 
-		for (System system : systems) {
+		for (BaseSystem system : systems) {
 			system.setWorld(this);
 			system.setup();
 		}
 
-		systems.forEach(System::initialize);
+		systems.forEach(BaseSystem::initialize);
 
 		flush();
 	}
@@ -61,7 +61,7 @@ public class World implements EntityListener, Serializable {
 	 * @see WorldBuilder
 	 */
 	public void update() {
-		for (System system : this.systems) {
+		for (BaseSystem system : this.systems) {
 			system.update();
 			flush();
 		}

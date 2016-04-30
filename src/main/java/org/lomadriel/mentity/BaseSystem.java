@@ -30,7 +30,7 @@ import java.lang.ref.WeakReference;
  * @author Jérôme BOULMIER
  * @since 0.1
  */
-public abstract class System implements Serializable {
+public abstract class BaseSystem implements Serializable {
 	private static final long serialVersionUID = 4814147056473193164L;
 
 	private transient WeakReference<World> world;
