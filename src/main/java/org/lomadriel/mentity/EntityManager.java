@@ -33,7 +33,7 @@ import java.util.BitSet;
  * @author Benoît CORTIER
  * @since 0.1
  */
-class EntityManager implements Serializable {
+class EntityManager implements Serializable, Cloneable {
 	private static final long serialVersionUID = 2007045073473283304L;
 
 	private final BitSet entities = new BitSet();
@@ -110,5 +110,18 @@ class EntityManager implements Serializable {
 			this.nextIndex = this.tempNextIndex;
 			this.tempNextIndex = Integer.MAX_VALUE;
 		}
+	}
+
+	@Override
+	public EntityManager clone() {
+		EntityManager manager = null;
+
+		try {
+			manager = (EntityManager) super.clone();
+		} catch (CloneNotSupportedException e) {
+			// Unreachable
+		}
+
+		return manager;
 	}
 }
