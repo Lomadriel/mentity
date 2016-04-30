@@ -98,12 +98,12 @@ public class Bag<E> implements Serializable {
 	}
 
 	/**
-	 * Returns the index of the highest element.
+	 * Returns the size of this collection.
 	 *
-	 * @return the index of the highest element.
+	 * @return the size of this collection.
 	 */
 	public int size() {
-		return this.highestElement;
+		return this.highestElement + 1;
 	}
 
 	/**
@@ -128,7 +128,7 @@ public class Bag<E> implements Serializable {
 	private void writeObject(ObjectOutputStream stream) throws IOException {
 		stream.defaultWriteObject();
 
-		for (int i = 0; i < this.highestElement; i++) {
+		for (int i = 0; i <= this.highestElement; i++) {
 			stream.writeObject(this.elements[i]);
 		}
 	}
@@ -140,7 +140,7 @@ public class Bag<E> implements Serializable {
 		int newCapacity = Bag.nextPowerOfTwo(this.highestElement + 1);
 		this.elements = (E[]) new Object[newCapacity];
 
-		for (int i = 0; i < this.highestElement; i++) {
+		for (int i = 0; i <= this.highestElement; i++) {
 			this.elements[i] = (E) stream.readObject();
 		}
 
