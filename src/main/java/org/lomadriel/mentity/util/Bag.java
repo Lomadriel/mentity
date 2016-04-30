@@ -96,6 +96,24 @@ public class Bag<E> implements Serializable {
 		}
 	}
 
+	/**
+	 * Returns the index of the highest element.
+	 *
+	 * @return the index of the highest element.
+	 */
+	public int size() {
+		return this.highestElement;
+	}
+
+	/**
+	 * Returns the current capacity of this collection.
+	 *
+	 * @return the current capacity of this collection.
+	 */
+	public int capacity() {
+		return this.elements.length;
+	}
+
 	private void ensureCapacity(int index) {
 		if (index >= this.elements.length) {
 			// It might be more interresting to double the array length rather than compute the next power of two.
