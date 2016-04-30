@@ -21,7 +21,6 @@
 
 package org.lomadriel.mentity;
 
-import java.io.Serializable;
 import java.util.BitSet;
 import java.util.Set;
 
@@ -32,27 +31,29 @@ import java.util.Set;
  * @author Jérôme BOULMIER
  * @since 0.1
  */
-public class World implements EntityListener, Serializable {
-	private static final long serialVersionUID = 3335361230408407617L;
+public class World implements EntityListener {
 	private static final String ENTITY_DOES_NOT_EXIST_MSG = "This entity doesn't exist";
 
-	private final EntityManager entityManager = new EntityManager();
-	private final ComponentManager componentManager = new ComponentManager();
-	private final transient FilteredSystemManager filteredSystemManager = new FilteredSystemManager(this);
+	private final EntityManager entityManager;
+	private final ComponentManager componentManager;
+	private final FilteredSystemManager filteredSystemManager = new FilteredSystemManager(this);
 	private final BaseSystem[] systems;
-	private transient boolean hasToBeFlushed = true;
+	private boolean hasToBeFlushed = true;
 
 	World(Set<BaseSystem> systems) {
+		this.entityManager = new EntityManager();
+		this.componentManager = new ComponentManager();
 		this.systems = systems.toArray(new BaseSystem[systems.size()]);
 
-		for (BaseSystem system : systems) {
-			system.setWorld(this);
-			system.setup();
-		}
+		init();
+	}
 
-		systems.forEach(BaseSystem::initialize);
+	World(Set<BaseSystem> systems, WorldSave save) {
+		this.entityManager = save.entityManager;
+		this.componentManager = save.componentManager;
+		this.systems = systems.toArray(new BaseSystem[systems.size()]);
 
-		flush();
+		init();
 	}
 
 	/**
@@ -134,7 +135,7 @@ public class World implements EntityListener, Serializable {
 	}
 
 	/**
-	 * Return {@code true} if the given {@code entity} has the given component.
+	 * Returns {@code true} if the given {@code entity} has the given component.
 	 *
 	 * @param entity         an entity
 	 * @param componentClass component's class
@@ -174,7 +175,7 @@ public class World implements EntityListener, Serializable {
 	 *
 	 * @param positionComponentClass component's class
 	 * @param <T>                    component's class
-	 * @return the component mapper of the given {@code component}.
+	 * @return the component mapper of the given component's class.
 	 */
 	public <T extends Component> ComponentMapper<T> getMapper(Class<T> positionComponentClass) {
 		return this.componentManager.getMapper(positionComponentClass);
@@ -205,8 +206,30 @@ public class World implements EntityListener, Serializable {
 		return this.entityManager.getEntities();
 	}
 
+	/**
+	 * Creates an image of the world at time t.
+	 *
+	 * @return an image of the world at time t.
+	 */
+	public WorldSave save() {
+		return new WorldSave(this.entityManager.clone(), this.componentManager.clone());
+	}
+
 	void registerFilteredEntitySystem(FilteredSystem filteredEntitySystem) {
 		this.filteredSystemManager.register(filteredEntitySystem);
+	}
+
+	private void init() {
+		for (BaseSystem system : this.systems) {
+			system.setWorld(this);
+			system.setup();
+		}
+
+		for (BaseSystem system : this.systems) {
+			system.initialize();
+		}
+
+		flush();
 	}
 
 	private void flush() {
@@ -217,6 +240,4 @@ public class World implements EntityListener, Serializable {
 			this.hasToBeFlushed = false;
 		}
 	}
-
-	// TODO: 4/21/16 Implement writeObject & readObject 
 }
