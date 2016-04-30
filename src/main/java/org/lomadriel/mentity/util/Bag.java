@@ -118,7 +118,8 @@ public class Bag<E> implements Serializable {
 	private void readObject(ObjectInputStream stream) throws IOException, ClassNotFoundException {
 		stream.defaultReadObject();
 
-		ensureCapacity(this.highestElement);
+		int newCapacity = Bag.nextPowerOfTwo(this.highestElement + 1);
+		this.elements = (E[]) new Object[newCapacity];
 
 		for (int i = 0; i < this.highestElement; i++) {
 			this.elements[i] = (E) stream.readObject();
