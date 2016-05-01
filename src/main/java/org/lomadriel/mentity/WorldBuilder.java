@@ -21,10 +21,12 @@
 
 package org.lomadriel.mentity;
 
+import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.Objects;
+import java.util.PriorityQueue;
+import java.util.Queue;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 /**
@@ -50,18 +52,13 @@ public class WorldBuilder {
 		HIGHEST
 	}
 
-	private class Node implements Comparable<Node> {
+	private class Node {
 		final System system;
 		final Priority priority;
 
 		Node(System system, Priority priority) {
 			this.system = system;
 			this.priority = priority;
-		}
-
-		@Override
-		public int compareTo(Node o) {
-			return this.priority.ordinal() - o.priority.ordinal();
 		}
 
 		@Override
@@ -79,7 +76,10 @@ public class WorldBuilder {
 		}
 	}
 
-	private final Set<Node> systems = new TreeSet<>();
+	private static final Comparator<Node> NODE_COMPARATOR
+			= ((o1, o2) -> o1.priority.ordinal() - o2.priority.ordinal());
+
+	private final Queue<Node> systems = new PriorityQueue<>(NODE_COMPARATOR);
 
 	/**
 	 * Adds a {@code system} in the {@code World} with the default priority.
