@@ -86,6 +86,8 @@ public class World {
 	 * @see WorldBuilder
 	 */
 	public void update() {
+		flush();
+
 		for (BaseSystem system : this.systems) {
 			system.update();
 			flush();
