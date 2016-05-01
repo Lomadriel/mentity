@@ -31,7 +31,7 @@ import java.util.Map;
  * @author Jérôme BOULMIER
  * @since 0.1
  */
-class ComponentManager implements Serializable {
+class ComponentManager implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1491726414158764138L;
 
 	private final Map<Class<? extends Component>, ComponentMapper<? extends Component>> mappers = new HashMap<>();
@@ -115,5 +115,18 @@ class ComponentManager implements Serializable {
 
 	void flush() {
 		this.mappers.values().forEach(ComponentMapper::flush);
+	}
+
+	@Override
+	public ComponentManager clone() {
+		ComponentManager manager = null;
+
+		try {
+			manager = (ComponentManager) super.clone();
+		} catch (CloneNotSupportedException e) {
+			// Unreachable
+		}
+
+		return manager;
 	}
 }

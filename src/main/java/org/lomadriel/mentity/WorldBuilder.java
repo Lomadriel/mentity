@@ -139,4 +139,17 @@ public class WorldBuilder {
 
 		return new World(systems);
 	}
+
+	/**
+	 * Builds the world from a save.
+	 *
+	 * @return the world.
+	 */
+	public World toWorld(WorldSave save) {
+		Set<BaseSystem> systems = this.systems.stream()
+				.map(node -> node.system)
+				.collect(Collectors.toCollection(LinkedHashSet::new));
+
+		return new World(systems, save);
+	}
 }

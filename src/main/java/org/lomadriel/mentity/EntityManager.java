@@ -23,6 +23,8 @@ package org.lomadriel.mentity;
 
 import org.lomadriel.lfc.event.EventDispatcher;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.util.BitSet;
 
@@ -33,17 +35,21 @@ import java.util.BitSet;
  * @author Benoît CORTIER
  * @since 0.1
  */
-class EntityManager implements Serializable {
+class EntityManager implements Serializable, Cloneable {
 	private static final long serialVersionUID = 2007045073473283304L;
 
-	private final BitSet entities = new BitSet();
+	private final BitSet entities;
 	private final transient BitSet removeQueue = new BitSet();
 
 	private transient int nextIndex;
 	private transient int tempNextIndex = Integer.MAX_VALUE;
 
 	EntityManager() {
+		this.entities = new BitSet();
+	}
 
+	private EntityManager(EntityManager copy) {
+		this.entities = copy.entities;
 	}
 
 	/**
@@ -110,5 +116,28 @@ class EntityManager implements Serializable {
 			this.nextIndex = this.tempNextIndex;
 			this.tempNextIndex = Integer.MAX_VALUE;
 		}
+	}
+
+	@Override
+	public EntityManager clone() {
+		EntityManager manager = null;
+
+		try {
+			manager = (EntityManager) super.clone();
+		} catch (CloneNotSupportedException e) {
+			// Unreachable
+		}
+
+		return manager;
+	}
+
+	private Object readResolve() {
+		return new EntityManager(this);
+	}
+
+	private void readObject(ObjectInputStream stream) throws IOException, ClassNotFoundException {
+		stream.defaultReadObject();
+
+		this.tempNextIndex = Integer.MAX_VALUE;
 	}
 }
