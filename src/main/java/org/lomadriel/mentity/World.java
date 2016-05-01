@@ -172,12 +172,12 @@ public class World implements EntityListener, Serializable {
 	/**
 	 * Gets the component mapper.
 	 *
-	 * @param positionComponentClass component's class
-	 * @param <T>                    component's class
+	 * @param componentClass component's class
+	 * @param <T>            component's class
 	 * @return the component mapper of the given {@code component}.
 	 */
-	public <T extends Component> ComponentMapper<T> getMapper(Class<T> positionComponentClass) {
-		return this.componentManager.getMapper(positionComponentClass);
+	public <T extends Component> ComponentMapper<T> getMapper(Class<T> componentClass) {
+		return this.componentManager.getMapper(componentClass);
 	}
 
 	/**
