@@ -61,6 +61,8 @@ public class World implements EntityListener, Serializable {
 	 * @see WorldBuilder
 	 */
 	public void update() {
+		flush();
+
 		for (System system : this.systems) {
 			system.update();
 			flush();
