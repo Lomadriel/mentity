@@ -10,8 +10,8 @@ import java.io.Serializable;
 public class WorldSave implements Serializable {
 	private static final long serialVersionUID = 7615221804208638510L;
 
-	final EntityManager entityManager;
-	final ComponentManager componentManager;
+	private final EntityManager entityManager;
+	private final ComponentManager componentManager;
 
 	/**
 	 * Creates the world save.
@@ -22,5 +22,13 @@ public class WorldSave implements Serializable {
 	WorldSave(EntityManager entityManager, ComponentManager componentManager) {
 		this.entityManager = entityManager;
 		this.componentManager = componentManager;
+	}
+
+	EntityManager getEntityManager() {
+		return this.entityManager;
+	}
+
+	ComponentManager getComponentManager() {
+		return this.componentManager;
 	}
 }

@@ -49,8 +49,8 @@ public class World implements EntityListener {
 	}
 
 	World(Set<BaseSystem> systems, WorldSave save) {
-		this.entityManager = save.entityManager;
-		this.componentManager = save.componentManager;
+		this.entityManager = save.getEntityManager();
+		this.componentManager = save.getComponentManager();
 		this.systems = systems.toArray(new BaseSystem[systems.size()]);
 
 		init();

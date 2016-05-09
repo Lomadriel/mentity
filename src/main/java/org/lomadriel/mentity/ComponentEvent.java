@@ -2,7 +2,7 @@ package org.lomadriel.mentity;
 
 import org.lomadriel.lfc.event.Event;
 
-public class ComponentEvent implements Event<ComponentListener> {
+public final class ComponentEvent implements Event<ComponentListener> {
 	public enum Type {
 		ADDED,
 		REMOVED
