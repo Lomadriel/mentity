@@ -21,6 +21,7 @@
 
 package org.lomadriel.mentity;
 
+import org.lomadriel.lfc.event.EventDispatcher;
 import org.lomadriel.mentity.util.Bag;
 
 import java.io.IOException;
@@ -38,15 +39,18 @@ import java.util.BitSet;
 public class ComponentMapper<T extends Component> implements Serializable {
 	private static final long serialVersionUID = 494271719946187185L;
 
+	private final Class<T> componentClass;
 	private final Bag<T> components;
 	private final transient BitSet componentsBitSet = new BitSet(); // No need to serialize this.
 	private final transient BitSet removeQueue = new BitSet();
 
-	ComponentMapper() {
+	ComponentMapper(Class<T> componentClass) {
+		this.componentClass = componentClass;
 		this.components = new Bag<>();
 	}
 
 	private ComponentMapper(ComponentMapper copy) {
+		this.componentClass = copy.componentClass;
 		this.components = copy.components;
 
 		for (int i = 0; i < this.components.size(); i++) {
@@ -72,6 +76,7 @@ public class ComponentMapper<T extends Component> implements Serializable {
 
 		this.components.set(entity, component);
 		this.componentsBitSet.set(entity);
+		EventDispatcher.getInstance().fire(new ComponentEvent(ComponentEvent.Type.ADDED, component.getClass(), entity));
 	}
 
 	/**
@@ -109,6 +114,7 @@ public class ComponentMapper<T extends Component> implements Serializable {
 		assert (entity >= 0);
 
 		this.removeQueue.set(entity);
+		EventDispatcher.getInstance().fire(new ComponentEvent(ComponentEvent.Type.REMOVED, this.componentClass, entity));
 	}
 
 	/**

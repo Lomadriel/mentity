@@ -50,7 +50,7 @@ class ComponentManager implements Serializable, Cloneable {
 		@SuppressWarnings("unchecked")
 		ComponentMapper<T> mapper = (ComponentMapper<T>) this.mappers.get(componentClass);
 		if (mapper == null) {
-			mapper = new ComponentMapper<>();
+			mapper = new ComponentMapper<>(componentClass);
 			this.mappers.put(componentClass, mapper);
 		}
 
