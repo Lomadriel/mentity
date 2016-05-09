@@ -33,7 +33,7 @@ import java.util.Map;
  * @author Jérôme BOULMIER
  * @since 0.1
  */
-class ComponentManager implements Serializable, Cloneable {
+public class ComponentManager implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1491726414158764138L;
 
 	private final Map<Class<? extends Component>, ComponentMapper<? extends Component>> mappers = new HashMap<>();
@@ -58,7 +58,7 @@ class ComponentManager implements Serializable, Cloneable {
 	 * @param <T>            class of the component.
 	 * @return a mapper
 	 */
-	<T extends Component> ComponentMapper<T> getMapper(Class<T> componentClass) {
+	public <T extends Component> ComponentMapper<T> getMapper(Class<T> componentClass) {
 		@SuppressWarnings("unchecked")
 		ComponentMapper<T> mapper = (ComponentMapper<T>) this.mappers.get(componentClass);
 		if (mapper == null) {
@@ -79,7 +79,7 @@ class ComponentManager implements Serializable, Cloneable {
 	 * @param <T>            type of the component.
 	 * @throws NullPointerException if the component is null.
 	 */
-	<T extends Component> void addComponent(int entity, Class<T> componentClass, T component) {
+	public <T extends Component> void addComponent(int entity, Class<T> componentClass, T component) {
 		getMapper(componentClass).addComponent(entity, component);
 	}
 
@@ -91,7 +91,7 @@ class ComponentManager implements Serializable, Cloneable {
 	 * @param <T>            component's class
 	 * @return {@code true} if the given {@code entity} has the given component.
 	 */
-	<T extends Component> boolean hasComponent(int entity, Class<T> componentClass) {
+	public <T extends Component> boolean hasComponent(int entity, Class<T> componentClass) {
 		return getMapper(componentClass).hasComponent(entity);
 	}
 
@@ -103,7 +103,7 @@ class ComponentManager implements Serializable, Cloneable {
 	 * @param componentClass component's class
 	 * @param <T>            component's class
 	 */
-	<T extends Component> void removeComponent(int entity, Class<T> componentClass) {
+	public <T extends Component> void removeComponent(int entity, Class<T> componentClass) {
 		getMapper(componentClass).removeComponent(entity);
 	}
 

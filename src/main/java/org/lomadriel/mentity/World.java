@@ -95,7 +95,7 @@ public class World implements EntityListener {
 	public int createEntity(Prefabs prefabs) {
 		int entity = createEntity();
 
-		prefabs.initialize(this, entity);
+		prefabs.initialize(this.componentManager, entity);
 
 		return entity;
 	}
@@ -125,6 +125,7 @@ public class World implements EntityListener {
 	 * @throws IllegalArgumentException if the entity doesn't exist.
 	 * @throws NullPointerException     if the component is null.
 	 */
+	@Deprecated
 	public <T extends Component> void addComponent(int entity, Class<T> componentClass, T component) {
 		if (!this.entityManager.entityExists(entity)) {
 			throw new IllegalArgumentException(ENTITY_DOES_NOT_EXIST_MSG);
@@ -161,6 +162,7 @@ public class World implements EntityListener {
 	 * @param <T>            component's class
 	 * @throws IllegalArgumentException if the entity doesn't exist.
 	 */
+	@Deprecated
 	public <T extends Component> void removeComponent(int entity, Class<T> componentClass) {
 		if (!this.entityManager.entityExists(entity)) {
 			throw new IllegalArgumentException(ENTITY_DOES_NOT_EXIST_MSG);
@@ -224,6 +226,7 @@ public class World implements EntityListener {
 			if (!this.entityManager.entityExists(entity)) {
 				throw new IllegalArgumentException(ENTITY_DOES_NOT_EXIST_MSG);
 			}
+			this.hasToBeFlushed = true;
 		});
 
 		for (BaseSystem system : this.systems) {

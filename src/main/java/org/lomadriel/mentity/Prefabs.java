@@ -31,8 +31,8 @@ public interface Prefabs {
 	/**
 	 * Invoked when an entity is built with this prefabs. {@link World#createEntity(Prefabs)}
 	 *
-	 * @param world  world in which the entity is built.
-	 * @param entity entity id.
+	 * @param componentManager componentManager of the world.
+	 * @param entity           entity id.
 	 */
-	void initialize(World world, int entity);
+	void initialize(ComponentManager componentManager, int entity);
 }
