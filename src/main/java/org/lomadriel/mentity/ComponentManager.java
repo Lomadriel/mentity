@@ -21,6 +21,8 @@
 
 package org.lomadriel.mentity;
 
+import org.lomadriel.mentity.util.Action;
+
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
@@ -36,7 +38,17 @@ class ComponentManager implements Serializable, Cloneable {
 
 	private final Map<Class<? extends Component>, ComponentMapper<? extends Component>> mappers = new HashMap<>();
 
+	private transient Action onComponentAdded;
+
 	ComponentManager() {
+	}
+
+	void onComponentAdded(Action action) {
+		this.onComponentAdded = action;
+
+		for (ComponentMapper<? extends Component> componentMapper : this.mappers.values()) {
+			componentMapper.onComponentAdded(action);
+		}
 	}
 
 	/**
@@ -51,6 +63,7 @@ class ComponentManager implements Serializable, Cloneable {
 		ComponentMapper<T> mapper = (ComponentMapper<T>) this.mappers.get(componentClass);
 		if (mapper == null) {
 			mapper = new ComponentMapper<>(componentClass);
+			mapper.onComponentAdded(this.onComponentAdded);
 			this.mappers.put(componentClass, mapper);
 		}
 

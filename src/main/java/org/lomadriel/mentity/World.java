@@ -220,6 +220,12 @@ public class World implements EntityListener {
 	}
 
 	private void init() {
+		this.componentManager.onComponentAdded(entity -> {
+			if (!this.entityManager.entityExists(entity)) {
+				throw new IllegalArgumentException(ENTITY_DOES_NOT_EXIST_MSG);
+			}
+		});
+
 		for (BaseSystem system : this.systems) {
 			system.setWorld(this);
 			system.setup();

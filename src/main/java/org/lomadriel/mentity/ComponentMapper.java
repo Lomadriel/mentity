@@ -22,6 +22,7 @@
 package org.lomadriel.mentity;
 
 import org.lomadriel.lfc.event.EventDispatcher;
+import org.lomadriel.mentity.util.Action;
 import org.lomadriel.mentity.util.Bag;
 
 import java.io.IOException;
@@ -44,6 +45,8 @@ public class ComponentMapper<T extends Component> implements Serializable {
 	private final transient BitSet componentsBitSet = new BitSet(); // No need to serialize this.
 	private final transient BitSet removeQueue = new BitSet();
 
+	private transient Action onComponentAdded;
+
 	ComponentMapper(Class<T> componentClass) {
 		this.componentClass = componentClass;
 		this.components = new Bag<>();
@@ -60,6 +63,10 @@ public class ComponentMapper<T extends Component> implements Serializable {
 		}
 	}
 
+	void onComponentAdded(Action action) {
+		this.onComponentAdded = action;
+	}
+
 	/**
 	 * Adds the given component to the given entity.
 	 *
@@ -73,6 +80,8 @@ public class ComponentMapper<T extends Component> implements Serializable {
 		if (component == null) {
 			throw new NullPointerException("Component can't be null");
 		}
+
+		this.onComponentAdded.handleEntity(entity);
 
 		this.components.set(entity, component);
 		this.componentsBitSet.set(entity);
