@@ -35,6 +35,7 @@ import java.io.Serializable;
  */
 public abstract class Component implements Serializable {
 	private static final long serialVersionUID = 7657325065672262186L;
+
 	int entity;
 
 	/**

@@ -31,6 +31,7 @@ import java.io.Serializable;
  *
  * @param <E> type of the elements in this list.
  * @since 0.4.0
+ * @author Jérôme BOULMIER
  */
 public class Bag<E> implements Serializable {
 	private static final long serialVersionUID = 3314881599845413840L;

@@ -23,6 +23,8 @@ package org.lomadriel.mentity.util;
 
 /**
  * Abstract event.
+ *
+ * @author Jérôme BOULMIER
  */
 public abstract class EventObject {
 	private final Object source;
