@@ -21,7 +21,8 @@
 
 package org.lomadriel.mentity;
 
-import java.io.Serializable;
+import org.lomadriel.mentity.util.EventHandler;
+
 import java.util.BitSet;
 import java.util.Set;
 
@@ -32,27 +33,51 @@ import java.util.Set;
  * @author Jérôme BOULMIER
  * @since 0.1
  */
-public class World implements EntityListener, Serializable {
-	private static final long serialVersionUID = 3335361230408407617L;
+public class World {
 	private static final String ENTITY_DOES_NOT_EXIST_MSG = "This entity doesn't exist";
 
-	private final EntityManager entityManager = new EntityManager();
-	private final ComponentManager componentManager = new ComponentManager();
-	private final transient FilteredSystemManager filteredSystemManager = new FilteredSystemManager(this);
-	private final System[] systems;
-	private transient boolean hasToBeFlushed = true;
+	private final EntityManager entityManager;
+	private final ComponentManager componentManager;
+	private final FilteredSystemManager filteredSystemManager = new FilteredSystemManager(this);
+	private final BaseSystem[] systems;
+	private boolean hasToBeFlushed = true;
 
-	World(Set<System> systems) {
-		this.systems = systems.toArray(new System[systems.size()]);
+	World(Set<BaseSystem> systems) {
+		this.entityManager = new EntityManager();
+		this.componentManager = new ComponentManager();
+		this.systems = systems.toArray(new BaseSystem[systems.size()]);
 
-		for (System system : systems) {
-			system.setWorld(this);
-			system.setup();
-		}
+		init();
+	}
 
-		systems.forEach(System::initialize);
+	World(Set<BaseSystem> systems, WorldSave save) {
+		this.entityManager = save.getEntityManager();
+		this.componentManager = save.getComponentManager();
+		this.systems = systems.toArray(new BaseSystem[systems.size()]);
 
-		flush();
+		init();
+	}
+
+	public final void setOnEntityCreated(EventHandler<EntityEvent> eventHandler) {
+		this.entityManager.setOnEntityCreated(eventHandler);
+	}
+
+	public final void setOnEntityRemoved(EventHandler<EntityEvent> eventHandler) {
+		this.entityManager.setOnEntityRemoved(eventHandler);
+	}
+
+	public final void setOnComponentAdded(EventHandler<ComponentEvent> eventHandler) {
+		this.componentManager.setOnComponentAdded(event -> {
+			onComponentModification(event);
+			eventHandler.handleEvent(event);
+		});
+	}
+
+	public final void setOnComponentRemoved(EventHandler<ComponentEvent> eventHandler) {
+		this.componentManager.setOnComponentRemoved(event -> {
+			onComponentModification(event);
+			eventHandler.handleEvent(event);
+		});
 	}
 
 	/**
@@ -63,7 +88,7 @@ public class World implements EntityListener, Serializable {
 	public void update() {
 		flush();
 
-		for (System system : this.systems) {
+		for (BaseSystem system : this.systems) {
 			system.update();
 			flush();
 		}
@@ -84,6 +109,7 @@ public class World implements EntityListener, Serializable {
 	 * @return the new entity.
 	 */
 	public int createEntity() {
+		this.hasToBeFlushed = true;
 		return this.entityManager.createEntity();
 	}
 
@@ -96,7 +122,7 @@ public class World implements EntityListener, Serializable {
 	public int createEntity(Prefabs prefabs) {
 		int entity = createEntity();
 
-		prefabs.initialize(this, entity);
+		prefabs.initialize(this.componentManager, entity);
 
 		return entity;
 	}
@@ -105,10 +131,11 @@ public class World implements EntityListener, Serializable {
 	 * Destroys the given {@code entity}.
 	 *
 	 * @param entity an entity
+	 * @throws IllegalArgumentException if the entity doesn't exist.
 	 */
 	public void destroyEntity(int entity) {
 		if (!this.entityManager.entityExists(entity)) {
-			return;
+			throw new IllegalArgumentException(ENTITY_DOES_NOT_EXIST_MSG);
 		}
 
 		this.entityManager.destroyEntity(entity);
@@ -126,6 +153,7 @@ public class World implements EntityListener, Serializable {
 	 * @throws IllegalArgumentException if the entity doesn't exist.
 	 * @throws NullPointerException     if the component is null.
 	 */
+	@Deprecated
 	public <T extends Component> void addComponent(int entity, Class<T> componentClass, T component) {
 		if (!this.entityManager.entityExists(entity)) {
 			throw new IllegalArgumentException(ENTITY_DOES_NOT_EXIST_MSG);
@@ -136,19 +164,14 @@ public class World implements EntityListener, Serializable {
 	}
 
 	/**
-	 * Return {@code true} if the given {@code entity} has the given component.
+	 * Returns {@code true} if the given {@code entity} has the given component.
 	 *
 	 * @param entity         an entity
 	 * @param componentClass component's class
 	 * @param <T>            component's class
 	 * @return {@code true} if the given {@code entity} has the given component, false otherwise.
-	 * @throws IllegalArgumentException if the entity doesn't exist.
 	 */
 	public <T extends Component> boolean hasComponent(int entity, Class<T> componentClass) {
-		if (!this.entityManager.entityExists(entity)) {
-			throw new IllegalArgumentException(ENTITY_DOES_NOT_EXIST_MSG);
-		}
-
 		return this.componentManager.hasComponent(entity, componentClass);
 	}
 
@@ -162,6 +185,7 @@ public class World implements EntityListener, Serializable {
 	 * @param <T>            component's class
 	 * @throws IllegalArgumentException if the entity doesn't exist.
 	 */
+	@Deprecated
 	public <T extends Component> void removeComponent(int entity, Class<T> componentClass) {
 		if (!this.entityManager.entityExists(entity)) {
 			throw new IllegalArgumentException(ENTITY_DOES_NOT_EXIST_MSG);
@@ -174,28 +198,12 @@ public class World implements EntityListener, Serializable {
 	/**
 	 * Gets the component mapper.
 	 *
-	 * @param positionComponentClass component's class
-	 * @param <T>                    component's class
+	 * @param componentClass component's class
+	 * @param <T>            component's class
 	 * @return the component mapper of the given {@code component}.
 	 */
-	public <T extends Component> ComponentMapper<T> getMapper(Class<T> positionComponentClass) {
-		return this.componentManager.getMapper(positionComponentClass);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void handleNewEntity(int entity) {
-		this.hasToBeFlushed = true;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void handleDeletedEntity(int entity) {
-		this.hasToBeFlushed = true;
+	public <T extends Component> ComponentMapper<T> getMapper(Class<T> componentClass) {
+		return this.componentManager.getMapper(componentClass);
 	}
 
 	/**
@@ -207,8 +215,33 @@ public class World implements EntityListener, Serializable {
 		return this.entityManager.getEntities();
 	}
 
+	/**
+	 * Creates an image of the world at time t.
+	 *
+	 * @return an image of the world at time t.
+	 */
+	public WorldSave save() {
+		return new WorldSave(this.entityManager.clone(), this.componentManager.clone());
+	}
+
 	void registerFilteredEntitySystem(FilteredSystem filteredEntitySystem) {
 		this.filteredSystemManager.register(filteredEntitySystem);
+	}
+
+	private void init() {
+		this.componentManager.setOnComponentAdded(event -> onComponentModification(event));
+		this.componentManager.setOnComponentRemoved(event -> onComponentModification(event));
+
+		for (BaseSystem system : this.systems) {
+			system.setWorld(this);
+			system.setup();
+		}
+
+		for (BaseSystem system : this.systems) {
+			system.initialize();
+		}
+
+		flush();
 	}
 
 	private void flush() {
@@ -220,5 +253,11 @@ public class World implements EntityListener, Serializable {
 		}
 	}
 
-	// TODO: 4/21/16 Implement writeObject & readObject 
+	private void onComponentModification(ComponentEvent event) {
+		if (!this.entityManager.entityExists(event.getEntity())) {
+			throw new IllegalArgumentException(ENTITY_DOES_NOT_EXIST_MSG);
+		}
+
+		this.hasToBeFlushed = true;
+	}
 }

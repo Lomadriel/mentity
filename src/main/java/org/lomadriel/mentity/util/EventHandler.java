@@ -19,47 +19,23 @@
  * This program is free software; you can redistribute it and/or modify
  */
 
-package org.lomadriel.mentity;
+package org.lomadriel.mentity.util;
 
-import java.io.Serializable;
-import java.lang.ref.WeakReference;
+import java.util.EventListener;
 
 /**
- * Basic system used to perform operations.
+ * Event handler
  *
+ * @param <T> class of the event.
  * @author Jérôme BOULMIER
- * @since 0.1
+ * @since 1.0
  */
-public abstract class System implements Serializable {
-	private static final long serialVersionUID = 4814147056473193164L;
-
-	private transient WeakReference<World> world;
-
-	void setWorld(World world) {
-		this.world = new WeakReference<>(world);
-	}
-
-	protected World getWorld() {
-		return this.world.get();
-	}
-
+@FunctionalInterface
+public interface EventHandler<T extends EventObject> extends EventListener {
 	/**
-	 * Setups the world.
-	 * Called when the world is constructed.
+	 * Calls when the event is fired.
+	 *
+	 * @param event - an event
 	 */
-	protected void setup() {
-	}
-
-	/**
-	 * Initializes the system.
-	 * Called by the world, once after setup.
-	 */
-	protected void initialize() {
-	}
-
-	/**
-	 * Updates the system.
-	 * Called by the world, at each update.
-	 */
-	protected abstract void update();
+	void handleEvent(T event);
 }

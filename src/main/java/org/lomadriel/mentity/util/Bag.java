@@ -30,7 +30,8 @@ import java.io.Serializable;
  * Auto-resizable array.
  *
  * @param <E> type of the elements in this list.
- * @since 0.4.0
+ * @author Jérôme BOULMIER
+ * @since 0.4
  */
 public class Bag<E> implements Serializable {
 	private static final long serialVersionUID = 3314881599845413840L;
@@ -78,13 +79,14 @@ public class Bag<E> implements Serializable {
 			return;
 		}
 
-		ensureCapacity(index);
-
-		this.elements[index] = value;
-
 		if (index > this.highestElement) {
 			this.highestElement = index;
+
+			// if index < this.highestElement, there is no need to ensure the capacity.
+			ensureCapacity(index);
 		}
+
+		this.elements[index] = value;
 	}
 
 	/**
@@ -94,6 +96,24 @@ public class Bag<E> implements Serializable {
 		for (int i = 0; i < Math.max(this.elements.length, this.highestElement); ++i) {
 			this.elements[i] = null;
 		}
+	}
+
+	/**
+	 * Returns the size of this collection.
+	 *
+	 * @return the size of this collection.
+	 */
+	public int size() {
+		return this.highestElement + 1;
+	}
+
+	/**
+	 * Returns the current capacity of this collection.
+	 *
+	 * @return the current capacity of this collection.
+	 */
+	public int capacity() {
+		return this.elements.length;
 	}
 
 	private void ensureCapacity(int index) {
@@ -109,7 +129,7 @@ public class Bag<E> implements Serializable {
 	private void writeObject(ObjectOutputStream stream) throws IOException {
 		stream.defaultWriteObject();
 
-		for (int i = 0; i < this.highestElement; i++) {
+		for (int i = 0; i <= this.highestElement; i++) {
 			stream.writeObject(this.elements[i]);
 		}
 	}
@@ -118,9 +138,10 @@ public class Bag<E> implements Serializable {
 	private void readObject(ObjectInputStream stream) throws IOException, ClassNotFoundException {
 		stream.defaultReadObject();
 
-		ensureCapacity(this.highestElement);
+		int newCapacity = Bag.nextPowerOfTwo(this.highestElement + 1);
+		this.elements = (E[]) new Object[newCapacity];
 
-		for (int i = 0; i < this.highestElement; i++) {
+		for (int i = 0; i <= this.highestElement; i++) {
 			this.elements[i] = (E) stream.readObject();
 		}
 

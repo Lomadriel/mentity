@@ -19,33 +19,39 @@
  * This program is free software; you can redistribute it and/or modify
  */
 
-package org.lomadriel.mentity;
-
-import org.lomadriel.lfc.event.EventDispatcher;
-
-import java.util.EventListener;
+package org.lomadriel.mentity.util;
 
 /**
- * Implements this interface to listen {@code EntityEvent}.
- * Then you have to register the listener.
+ * Abstract event.
  *
  * @author Jérôme BOULMIER
- * @see EntityEvent
- * @see EventDispatcher
- * @since 0.3
+ * @since 1.0
  */
-public interface EntityListener extends EventListener {
-	/**
-	 * This method is called when an entity is created
-	 *
-	 * @param entity the new entity.
-	 */
-	void handleNewEntity(int entity);
+public abstract class EventObject {
+	private final Object source;
 
 	/**
-	 * This method is called when an entity is added to the remove queue.
-	 *
-	 * @param entity the entity which will be destroyed.
+	 * Constructs an event with no source.
 	 */
-	void handleDeletedEntity(int entity);
+	public EventObject() {
+		this(null);
+	}
+
+	/**
+	 * Constructs an event with a source.
+	 *
+	 * @param source - source of the event.
+	 */
+	public EventObject(Object source) {
+		this.source = source;
+	}
+
+	/**
+	 * Returns the source of the event. If the source is unknown, the source is null.
+	 *
+	 * @return the source of the event.
+	 */
+	public Object getSource() {
+		return this.source;
+	}
 }

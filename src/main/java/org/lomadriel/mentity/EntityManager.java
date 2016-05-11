@@ -21,8 +21,10 @@
 
 package org.lomadriel.mentity;
 
-import org.lomadriel.lfc.event.EventDispatcher;
+import org.lomadriel.mentity.util.EventHandler;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.util.BitSet;
 
@@ -33,17 +35,32 @@ import java.util.BitSet;
  * @author Benoît CORTIER
  * @since 0.1
  */
-class EntityManager implements Serializable {
+class EntityManager implements Serializable, Cloneable {
 	private static final long serialVersionUID = 2007045073473283304L;
 
-	private final BitSet entities = new BitSet();
+	private final BitSet entities;
 	private final transient BitSet removeQueue = new BitSet();
 
 	private transient int nextIndex;
 	private transient int tempNextIndex = Integer.MAX_VALUE;
 
-	EntityManager() {
+	private transient EventHandler<EntityEvent> onEntityCreated;
+	private transient EventHandler<EntityEvent> onEntityRemoved;
 
+	EntityManager() {
+		this.entities = new BitSet();
+	}
+
+	private EntityManager(EntityManager copy) {
+		this.entities = copy.entities;
+	}
+
+	void setOnEntityCreated(EventHandler<EntityEvent> eventHandler) {
+		this.onEntityCreated = eventHandler;
+	}
+
+	void setOnEntityRemoved(EventHandler<EntityEvent> eventHandler) {
+		this.onEntityRemoved = eventHandler;
 	}
 
 	/**
@@ -54,7 +71,10 @@ class EntityManager implements Serializable {
 	int createEntity() {
 		int entity = this.entities.nextClearBit(this.nextIndex);
 		this.entities.set(entity);
-		EventDispatcher.getInstance().fire(new EntityEvent(EntityEvent.Type.CREATED, entity));
+
+		if (this.onEntityCreated != null) {
+			this.onEntityCreated.handleEvent(new EntityEvent(EntityEvent.Type.CREATED, entity));
+		}
 
 		this.nextIndex = entity + 1;
 
@@ -78,7 +98,10 @@ class EntityManager implements Serializable {
 	 */
 	void destroyEntity(int entity) {
 		this.removeQueue.set(entity);
-		EventDispatcher.getInstance().fire(new EntityEvent(EntityEvent.Type.DESTROYED, entity));
+
+		if (this.onEntityRemoved != null) {
+			this.onEntityRemoved.handleEvent(new EntityEvent(EntityEvent.Type.DESTROYED, entity));
+		}
 
 		if (entity < this.tempNextIndex) {
 			this.tempNextIndex = entity;
@@ -110,5 +133,28 @@ class EntityManager implements Serializable {
 			this.nextIndex = this.tempNextIndex;
 			this.tempNextIndex = Integer.MAX_VALUE;
 		}
+	}
+
+	@Override
+	public EntityManager clone() {
+		EntityManager manager = null;
+
+		try {
+			manager = (EntityManager) super.clone();
+		} catch (CloneNotSupportedException e) {
+			// Unreachable
+		}
+
+		return manager;
+	}
+
+	private Object readResolve() {
+		return new EntityManager(this);
+	}
+
+	private void readObject(ObjectInputStream stream) throws IOException, ClassNotFoundException {
+		stream.defaultReadObject();
+
+		this.tempNextIndex = Integer.MAX_VALUE;
 	}
 }

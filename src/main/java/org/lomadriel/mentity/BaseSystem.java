@@ -21,18 +21,42 @@
 
 package org.lomadriel.mentity;
 
+import java.lang.ref.WeakReference;
+
 /**
- * Class used to build a new entity with several components.
+ * Basic system used to perform operations.
  *
  * @author Jérôme BOULMIER
- * @since 0.9
+ * @since 0.1
  */
-public interface Prefabs {
+public abstract class BaseSystem {
+	private transient WeakReference<World> world;
+
+	void setWorld(World world) {
+		this.world = new WeakReference<>(world);
+	}
+
+	protected World getWorld() {
+		return this.world.get();
+	}
+
 	/**
-	 * Invoked when an entity is built with this prefabs. {@link World#createEntity(Prefabs)}
-	 *
-	 * @param componentManager componentManager of the world.
-	 * @param entity           entity id.
+	 * Setups the world.
+	 * Called when the world is constructed.
 	 */
-	void initialize(ComponentManager componentManager, int entity);
+	protected void setup() {
+	}
+
+	/**
+	 * Initializes the system.
+	 * Called by the world, once after setup.
+	 */
+	protected void initialize() {
+	}
+
+	/**
+	 * Updates the system.
+	 * Called by the world, at each update.
+	 */
+	protected abstract void update();
 }

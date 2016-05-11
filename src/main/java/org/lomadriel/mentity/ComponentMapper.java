@@ -22,7 +22,10 @@
 package org.lomadriel.mentity;
 
 import org.lomadriel.mentity.util.Bag;
+import org.lomadriel.mentity.util.EventHandler;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.util.BitSet;
 
@@ -36,11 +39,36 @@ import java.util.BitSet;
 public class ComponentMapper<T extends Component> implements Serializable {
 	private static final long serialVersionUID = 494271719946187185L;
 
-	private final Bag<T> components = new Bag<>();
+	private final Class<T> componentClass;
+	private final Bag<T> components;
 	private final transient BitSet componentsBitSet = new BitSet(); // No need to serialize this.
 	private final transient BitSet removeQueue = new BitSet();
 
-	ComponentMapper() {
+	private transient EventHandler<ComponentEvent> onComponentAdded;
+	private transient EventHandler<ComponentEvent> onComponentRemoved;
+
+	ComponentMapper(Class<T> componentClass) {
+		this.componentClass = componentClass;
+		this.components = new Bag<>();
+	}
+
+	private ComponentMapper(ComponentMapper copy) {
+		this.componentClass = copy.componentClass;
+		this.components = copy.components;
+
+		for (int i = 0; i < this.components.size(); i++) {
+			if (this.components.get(i) != null) {
+				this.componentsBitSet.set(i);
+			}
+		}
+	}
+
+	void setOnComponentAdded(EventHandler<ComponentEvent> eventHandler) {
+		this.onComponentAdded = eventHandler;
+	}
+
+	void setOnComponentRemoved(EventHandler<ComponentEvent> eventHandler) {
+		this.onComponentRemoved = eventHandler;
 	}
 
 	/**
@@ -57,15 +85,22 @@ public class ComponentMapper<T extends Component> implements Serializable {
 			throw new NullPointerException("Component can't be null");
 		}
 
+		component.entity = entity;
+
+		this.onComponentAdded.handleEvent(new ComponentEvent(this,
+				ComponentEvent.Type.ADDED,
+				this.componentClass,
+				entity));
+
 		this.components.set(entity, component);
 		this.componentsBitSet.set(entity);
 	}
 
 	/**
-	 * Returns true if the given entity have the component, false otherwise.
+	 * Returns true if the given entity has the component, false otherwise.
 	 *
 	 * @param entity an entity
-	 * @return Returns true if the entity have the component, false otherwise.
+	 * @return Returns true if the entity has the component, false otherwise.
 	 */
 	public boolean hasComponent(int entity) {
 		assert (entity >= 0);
@@ -95,6 +130,11 @@ public class ComponentMapper<T extends Component> implements Serializable {
 	public void removeComponent(int entity) {
 		assert (entity >= 0);
 
+		this.onComponentRemoved.handleEvent(new ComponentEvent(this,
+				ComponentEvent.Type.REMOVED,
+				this.componentClass,
+				entity));
+
 		this.removeQueue.set(entity);
 	}
 
@@ -114,5 +154,13 @@ public class ComponentMapper<T extends Component> implements Serializable {
 		}
 
 		this.removeQueue.clear();
+	}
+
+	private Object readResolve() {
+		return new ComponentMapper<>(this);
+	}
+
+	private void readObject(ObjectInputStream stream) throws IOException, ClassNotFoundException {
+		stream.defaultReadObject();
 	}
 }

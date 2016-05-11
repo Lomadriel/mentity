@@ -52,11 +52,12 @@ public class WorldBuilder {
 		HIGHEST
 	}
 
+
 	private class Node {
-		final System system;
+		final BaseSystem system;
 		final Priority priority;
 
-		Node(System system, Priority priority) {
+		Node(BaseSystem system, Priority priority) {
 			this.system = system;
 			this.priority = priority;
 		}
@@ -83,14 +84,14 @@ public class WorldBuilder {
 
 	/**
 	 * Adds a {@code system} in the {@code World} with the default priority.
-	 * See also, {@link #addSystem(System, Priority)}
+	 * See also, {@link #addSystem(BaseSystem, Priority)}
 	 *
 	 * @param system a system to add with the default priority.
 	 * @return itself
 	 * @throws NullPointerException     if the system or the priority is null.
 	 * @throws IllegalArgumentException if the system is already in this builder.
 	 */
-	public WorldBuilder addSystem(System system) {
+	public WorldBuilder addSystem(BaseSystem system) {
 		return addSystem(system, Priority.DEFAULT);
 	}
 
@@ -104,16 +105,16 @@ public class WorldBuilder {
 	 * @throws NullPointerException     if the system or the priority is null.
 	 * @throws IllegalArgumentException if the system is already in this builder.
 	 */
-	public WorldBuilder addSystem(System system, Priority priority) {
+	public WorldBuilder addSystem(BaseSystem system, Priority priority) {
 		if (system == null) {
-			throw new NullPointerException("System can't be null");
+			throw new NullPointerException("system can't be null");
 		}
 
 		if (priority == null) {
-			throw new NullPointerException("Priority can't be null");
+			throw new NullPointerException("priority can't be null");
 		}
 
-		Class<? extends System> systemClass = system.getClass();
+		Class<? extends BaseSystem> systemClass = system.getClass();
 
 		for (Node node : this.systems) {
 			if (node.system.getClass() == systemClass) {
@@ -132,10 +133,23 @@ public class WorldBuilder {
 	 * @return the world.
 	 */
 	public World toWorld() {
-		Set<System> systems = this.systems.stream()
+		Set<BaseSystem> systems = this.systems.stream()
 				.map(node -> node.system)
 				.collect(Collectors.toCollection(LinkedHashSet::new));
 
 		return new World(systems);
+	}
+
+	/**
+	 * Builds the world from a save.
+	 *
+	 * @return the world.
+	 */
+	public World toWorld(WorldSave save) {
+		Set<BaseSystem> systems = this.systems.stream()
+				.map(node -> node.system)
+				.collect(Collectors.toCollection(LinkedHashSet::new));
+
+		return new World(systems, save);
 	}
 }

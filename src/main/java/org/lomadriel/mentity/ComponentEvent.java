@@ -24,27 +24,29 @@ package org.lomadriel.mentity;
 import org.lomadriel.mentity.util.EventObject;
 
 /**
- * Event fired when an entity is created or deleted.
+ * Event fired when a component is added or removed.
  *
  * @author Jérôme BOULMIER
- * @since 0.3
+ * @since 1.0
  */
-public final class EntityEvent extends EventObject {
+public final class ComponentEvent extends EventObject {
 	/**
-	 * Event's type
+	 * Type of a {@code ComponentEvent}.
 	 */
-	enum Type {
-		CREATED,
-		DESTROYED
+	public enum Type {
+		ADDED,
+		REMOVED
 	}
 
 	private final Type type;
+	private final Class<? extends Component> componentClass;
 	private final int entity;
 
-	EntityEvent(Type type, int entity) {
-		super(null);
+	ComponentEvent(Object source, Type type, Class<? extends Component> componentClass, int entity) {
+		super(source);
 
 		this.type = type;
+		this.componentClass = componentClass;
 		this.entity = entity;
 	}
 
@@ -56,6 +58,15 @@ public final class EntityEvent extends EventObject {
 	 */
 	public Type getType() {
 		return this.type;
+	}
+
+	/**
+	 * Returns the class of the component.
+	 *
+	 * @return the class of the component.
+	 */
+	public Class<? extends Component> getComponentClass() {
+		return this.componentClass;
 	}
 
 	/**

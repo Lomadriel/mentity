@@ -26,13 +26,24 @@ import java.io.Serializable;
 /**
  * Component are data class.
  * Extends this class to define a new component.
- * Logic should be in a {@code System} or a {@code FilteredSystem}.
+ * Logic should be in a {@code BaseSystem} or a {@code FilteredSystem}.
  *
  * @author Jérôme BOULMIER
  * @see FilteredSystem
- * @see System
+ * @see BaseSystem
  * @since 0.1
  */
 public abstract class Component implements Serializable {
 	private static final long serialVersionUID = 7657325065672262186L;
+
+	int entity;
+
+	/**
+	 * Returns the id of the entity which owns the component.
+	 *
+	 * @return the id of the entity which owns the component.
+	 */
+	public final int getEntity() {
+		return this.entity;
+	}
 }
