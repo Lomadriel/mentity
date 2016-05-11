@@ -6,6 +6,7 @@ import java.io.Serializable;
  * Image of the world at the save time.
  *
  * @author Jérôme BOULMIER
+ * @since 1.0
  */
 public class WorldSave implements Serializable {
 	private static final long serialVersionUID = 7615221804208638510L;

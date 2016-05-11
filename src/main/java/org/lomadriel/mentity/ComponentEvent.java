@@ -23,6 +23,12 @@ package org.lomadriel.mentity;
 
 import org.lomadriel.mentity.util.EventObject;
 
+/**
+ * Event fired when a component is added or removed.
+ *
+ * @author Jérôme BOULMIER
+ * @since 1.0
+ */
 public final class ComponentEvent extends EventObject {
 	/**
 	 * Type of a {@code ComponentEvent}.

@@ -27,6 +27,8 @@ import java.util.EventListener;
  * Event handler
  *
  * @param <T> class of the event.
+ * @author Jérôme BOULMIER
+ * @since 1.0
  */
 @FunctionalInterface
 public interface EventHandler<T extends EventObject> extends EventListener {

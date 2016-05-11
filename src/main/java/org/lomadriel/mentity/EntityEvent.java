@@ -48,10 +48,21 @@ public final class EntityEvent extends EventObject {
 		this.entity = entity;
 	}
 
+	/**
+	 * Returns the type of the event.
+	 *
+	 * @return the type of the event.
+	 * @see Type
+	 */
 	public Type getType() {
 		return this.type;
 	}
 
+	/**
+	 * Returns the entity affected.
+	 *
+	 * @return the entity affected
+	 */
 	public int getEntity() {
 		return this.entity;
 	}
