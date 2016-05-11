@@ -21,6 +21,7 @@
 
 package org.lomadriel.mentity;
 
+import org.lomadriel.lfc.event.EventDispatcher;
 import org.lomadriel.mentity.util.Bag;
 import org.lomadriel.mentity.util.EventHandler;
 
@@ -81,19 +82,21 @@ public class ComponentMapper<T extends Component> implements Serializable {
 	public void addComponent(int entity, T component) {
 		assert (entity >= 0);
 
+		EventDispatcher.getInstance().fire(new InternalEvent(entity));
+
 		if (component == null) {
 			throw new NullPointerException("Component can't be null");
 		}
 
 		component.entity = entity;
 
+		this.components.set(entity, component);
+		this.componentsBitSet.set(entity);
+
 		this.onComponentAdded.handleEvent(new ComponentEvent(this,
 				ComponentEvent.Type.ADDED,
 				this.componentClass,
 				entity));
-
-		this.components.set(entity, component);
-		this.componentsBitSet.set(entity);
 	}
 
 	/**
@@ -130,12 +133,14 @@ public class ComponentMapper<T extends Component> implements Serializable {
 	public void removeComponent(int entity) {
 		assert (entity >= 0);
 
+		EventDispatcher.getInstance().fire(new InternalEvent(entity));
+
+		this.removeQueue.set(entity);
+
 		this.onComponentRemoved.handleEvent(new ComponentEvent(this,
 				ComponentEvent.Type.REMOVED,
 				this.componentClass,
 				entity));
-
-		this.removeQueue.set(entity);
 	}
 
 	/**

@@ -21,6 +21,7 @@
 
 package org.lomadriel.mentity;
 
+import org.lomadriel.lfc.event.EventDispatcher;
 import org.lomadriel.mentity.util.EventHandler;
 
 import java.util.BitSet;
@@ -33,7 +34,7 @@ import java.util.Set;
  * @author Jérôme BOULMIER
  * @since 0.1
  */
-public class World {
+public class World implements InternalEventListener {
 	private static final String ENTITY_DOES_NOT_EXIST_MSG = "This entity doesn't exist";
 
 	private final EntityManager entityManager;
@@ -67,17 +68,11 @@ public class World {
 	}
 
 	public final void setOnComponentAdded(EventHandler<ComponentEvent> eventHandler) {
-		this.componentManager.setOnComponentAdded(event -> {
-			onComponentModification(event);
-			eventHandler.handleEvent(event);
-		});
+		this.componentManager.setOnComponentAdded(eventHandler);
 	}
 
 	public final void setOnComponentRemoved(EventHandler<ComponentEvent> eventHandler) {
-		this.componentManager.setOnComponentRemoved(event -> {
-			onComponentModification(event);
-			eventHandler.handleEvent(event);
-		});
+		this.componentManager.setOnComponentRemoved(eventHandler);
 	}
 
 	/**
@@ -224,13 +219,26 @@ public class World {
 		return new WorldSave(this.entityManager.clone(), this.componentManager.clone());
 	}
 
+	/**
+	 * Internal API.
+	 *
+	 * @param event internal event.
+	 */
+	@Override
+	public void handleComponentModification(InternalEvent event) {
+		if (!this.entityManager.entityExists(event.getEntity())) {
+			throw new IllegalArgumentException(ENTITY_DOES_NOT_EXIST_MSG);
+		}
+
+		this.hasToBeFlushed = true;
+	}
+
 	void registerFilteredEntitySystem(FilteredSystem filteredEntitySystem) {
 		this.filteredSystemManager.register(filteredEntitySystem);
 	}
 
 	private void init() {
-		this.componentManager.setOnComponentAdded(event -> onComponentModification(event));
-		this.componentManager.setOnComponentRemoved(event -> onComponentModification(event));
+		EventDispatcher.getInstance().addListener(InternalEvent.class, this);
 
 		for (BaseSystem system : this.systems) {
 			system.setWorld(this);
@@ -251,13 +259,5 @@ public class World {
 			this.filteredSystemManager.updateAll();
 			this.hasToBeFlushed = false;
 		}
-	}
-
-	private void onComponentModification(ComponentEvent event) {
-		if (!this.entityManager.entityExists(event.getEntity())) {
-			throw new IllegalArgumentException(ENTITY_DOES_NOT_EXIST_MSG);
-		}
-
-		this.hasToBeFlushed = true;
 	}
 }
