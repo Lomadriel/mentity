@@ -85,6 +85,8 @@ public class ComponentMapper<T extends Component> implements Serializable {
 			throw new NullPointerException("Component can't be null");
 		}
 
+		component.entity = entity;
+
 		this.onComponentAdded.handleEvent(new ComponentEvent(this,
 				ComponentEvent.Type.ADDED,
 				this.componentClass,
