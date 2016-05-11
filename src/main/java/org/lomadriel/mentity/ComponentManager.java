@@ -21,7 +21,7 @@
 
 package org.lomadriel.mentity;
 
-import org.lomadriel.mentity.util.Action;
+import org.lomadriel.mentity.util.EventHandler;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -38,16 +38,25 @@ public class ComponentManager implements Serializable, Cloneable {
 
 	private final Map<Class<? extends Component>, ComponentMapper<? extends Component>> mappers = new HashMap<>();
 
-	private transient Action onComponentAdded;
+	private transient EventHandler<ComponentEvent> onComponentAdded;
+	private transient EventHandler<ComponentEvent> onComponentRemoved;
 
 	ComponentManager() {
 	}
 
-	void onComponentAdded(Action action) {
-		this.onComponentAdded = action;
+	void setOnComponentAdded(EventHandler<ComponentEvent> eventHandler) {
+		this.onComponentAdded = eventHandler;
 
 		for (ComponentMapper<? extends Component> componentMapper : this.mappers.values()) {
-			componentMapper.onComponentAdded(action);
+			componentMapper.setOnComponentAdded(eventHandler);
+		}
+	}
+
+	void setOnComponentRemoved(EventHandler<ComponentEvent> eventHandler) {
+		this.onComponentRemoved = eventHandler;
+
+		for (ComponentMapper<? extends Component> componentMapper : this.mappers.values()) {
+			componentMapper.setOnComponentRemoved(eventHandler);
 		}
 	}
 
@@ -63,7 +72,10 @@ public class ComponentManager implements Serializable, Cloneable {
 		ComponentMapper<T> mapper = (ComponentMapper<T>) this.mappers.get(componentClass);
 		if (mapper == null) {
 			mapper = new ComponentMapper<>(componentClass);
-			mapper.onComponentAdded(this.onComponentAdded);
+
+			mapper.setOnComponentAdded(this.onComponentAdded);
+			mapper.setOnComponentRemoved(this.onComponentRemoved);
+
 			this.mappers.put(componentClass, mapper);
 		}
 

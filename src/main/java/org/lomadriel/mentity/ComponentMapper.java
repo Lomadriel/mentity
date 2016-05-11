@@ -21,9 +21,8 @@
 
 package org.lomadriel.mentity;
 
-import org.lomadriel.lfc.event.EventDispatcher;
-import org.lomadriel.mentity.util.Action;
 import org.lomadriel.mentity.util.Bag;
+import org.lomadriel.mentity.util.EventHandler;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -45,7 +44,8 @@ public class ComponentMapper<T extends Component> implements Serializable {
 	private final transient BitSet componentsBitSet = new BitSet(); // No need to serialize this.
 	private final transient BitSet removeQueue = new BitSet();
 
-	private transient Action onComponentAdded;
+	private transient EventHandler<ComponentEvent> onComponentAdded;
+	private transient EventHandler<ComponentEvent> onComponentRemoved;
 
 	ComponentMapper(Class<T> componentClass) {
 		this.componentClass = componentClass;
@@ -63,8 +63,12 @@ public class ComponentMapper<T extends Component> implements Serializable {
 		}
 	}
 
-	void onComponentAdded(Action action) {
-		this.onComponentAdded = action;
+	void setOnComponentAdded(EventHandler<ComponentEvent> eventHandler) {
+		this.onComponentAdded = eventHandler;
+	}
+
+	void setOnComponentRemoved(EventHandler<ComponentEvent> eventHandler) {
+		this.onComponentRemoved = eventHandler;
 	}
 
 	/**
@@ -81,11 +85,13 @@ public class ComponentMapper<T extends Component> implements Serializable {
 			throw new NullPointerException("Component can't be null");
 		}
 
-		this.onComponentAdded.handleEntity(entity);
+		this.onComponentAdded.handleEvent(new ComponentEvent(this,
+				ComponentEvent.Type.ADDED,
+				this.componentClass,
+				entity));
 
 		this.components.set(entity, component);
 		this.componentsBitSet.set(entity);
-		EventDispatcher.getInstance().fire(new ComponentEvent(ComponentEvent.Type.ADDED, component.getClass(), entity));
 	}
 
 	/**
@@ -122,8 +128,12 @@ public class ComponentMapper<T extends Component> implements Serializable {
 	public void removeComponent(int entity) {
 		assert (entity >= 0);
 
+		this.onComponentRemoved.handleEvent(new ComponentEvent(this,
+				ComponentEvent.Type.REMOVED,
+				this.componentClass,
+				entity));
+
 		this.removeQueue.set(entity);
-		EventDispatcher.getInstance().fire(new ComponentEvent(ComponentEvent.Type.REMOVED, this.componentClass, entity));
 	}
 
 	/**

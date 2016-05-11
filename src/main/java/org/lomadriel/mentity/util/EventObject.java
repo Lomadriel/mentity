@@ -19,40 +19,36 @@
  * This program is free software; you can redistribute it and/or modify
  */
 
-package org.lomadriel.mentity;
-
-import org.lomadriel.mentity.util.EventObject;
+package org.lomadriel.mentity.util;
 
 /**
- * Event fired when an entity is created or deleted.
- *
- * @author Jérôme BOULMIER
- * @since 0.3
+ * Abstract event.
  */
-public final class EntityEvent extends EventObject {
+public abstract class EventObject {
+	private final Object source;
+
 	/**
-	 * Event's type
+	 * Constructs an event with no source.
 	 */
-	enum Type {
-		CREATED,
-		DESTROYED
+	public EventObject() {
+		this(null);
 	}
 
-	private final Type type;
-	private final int entity;
-
-	EntityEvent(Type type, int entity) {
-		super(null);
-
-		this.type = type;
-		this.entity = entity;
+	/**
+	 * Constructs an event with a source.
+	 *
+	 * @param source - source of the event.
+	 */
+	public EventObject(Object source) {
+		this.source = source;
 	}
 
-	public Type getType() {
-		return this.type;
-	}
-
-	public int getEntity() {
-		return this.entity;
+	/**
+	 * Returns the source of the event. If the source is unknown, the source is null.
+	 *
+	 * @return the source of the event.
+	 */
+	public Object getSource() {
+		return this.source;
 	}
 }

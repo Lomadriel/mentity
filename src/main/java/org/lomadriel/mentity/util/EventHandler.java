@@ -19,33 +19,21 @@
  * This program is free software; you can redistribute it and/or modify
  */
 
-package org.lomadriel.mentity;
-
-import org.lomadriel.lfc.event.EventDispatcher;
+package org.lomadriel.mentity.util;
 
 import java.util.EventListener;
 
 /**
- * Implements this interface to listen {@code EntityEvent}.
- * Then you have to register the listener.
+ * Event handler
  *
- * @author Jérôme BOULMIER
- * @see EntityEvent
- * @see EventDispatcher
- * @since 0.3
+ * @param <T> class of the event.
  */
-public interface EntityListener extends EventListener {
+@FunctionalInterface
+public interface EventHandler<T extends EventObject> extends EventListener {
 	/**
-	 * This method is called when an entity is created
+	 * Calls when the event is fired.
 	 *
-	 * @param entity the new entity.
+	 * @param event - an event
 	 */
-	void handleNewEntity(int entity);
-
-	/**
-	 * This method is called when an entity is added to the remove queue.
-	 *
-	 * @param entity the entity which will be destroyed.
-	 */
-	void handleDeletedEntity(int entity);
+	void handleEvent(T event);
 }

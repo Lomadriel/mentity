@@ -21,6 +21,8 @@
 
 package org.lomadriel.mentity;
 
+import org.lomadriel.mentity.util.EventHandler;
+
 import java.util.BitSet;
 import java.util.Set;
 
@@ -31,7 +33,7 @@ import java.util.Set;
  * @author Jérôme BOULMIER
  * @since 0.1
  */
-public class World implements EntityListener {
+public class World {
 	private static final String ENTITY_DOES_NOT_EXIST_MSG = "This entity doesn't exist";
 
 	private final EntityManager entityManager;
@@ -54,6 +56,28 @@ public class World implements EntityListener {
 		this.systems = systems.toArray(new BaseSystem[systems.size()]);
 
 		init();
+	}
+
+	public final void setOnEntityCreated(EventHandler<EntityEvent> eventHandler) {
+		this.entityManager.setOnEntityCreated(eventHandler);
+	}
+
+	public final void setOnEntityRemoved(EventHandler<EntityEvent> eventHandler) {
+		this.entityManager.setOnEntityRemoved(eventHandler);
+	}
+
+	public final void setOnComponentAdded(EventHandler<ComponentEvent> eventHandler) {
+		this.componentManager.setOnComponentAdded(event -> {
+			onComponentModification(event);
+			eventHandler.handleEvent(event);
+		});
+	}
+
+	public final void setOnComponentRemoved(EventHandler<ComponentEvent> eventHandler) {
+		this.componentManager.setOnComponentRemoved(event -> {
+			onComponentModification(event);
+			eventHandler.handleEvent(event);
+		});
 	}
 
 	/**
@@ -83,6 +107,7 @@ public class World implements EntityListener {
 	 * @return the new entity.
 	 */
 	public int createEntity() {
+		this.hasToBeFlushed = true;
 		return this.entityManager.createEntity();
 	}
 
@@ -104,10 +129,11 @@ public class World implements EntityListener {
 	 * Destroys the given {@code entity}.
 	 *
 	 * @param entity an entity
+	 * @throws IllegalArgumentException if the entity doesn't exist.
 	 */
 	public void destroyEntity(int entity) {
 		if (!this.entityManager.entityExists(entity)) {
-			return;
+			throw new IllegalArgumentException(ENTITY_DOES_NOT_EXIST_MSG);
 		}
 
 		this.entityManager.destroyEntity(entity);
@@ -142,13 +168,8 @@ public class World implements EntityListener {
 	 * @param componentClass component's class
 	 * @param <T>            component's class
 	 * @return {@code true} if the given {@code entity} has the given component, false otherwise.
-	 * @throws IllegalArgumentException if the entity doesn't exist.
 	 */
 	public <T extends Component> boolean hasComponent(int entity, Class<T> componentClass) {
-		if (!this.entityManager.entityExists(entity)) {
-			throw new IllegalArgumentException(ENTITY_DOES_NOT_EXIST_MSG);
-		}
-
 		return this.componentManager.hasComponent(entity, componentClass);
 	}
 
@@ -184,22 +205,6 @@ public class World implements EntityListener {
 	}
 
 	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void handleNewEntity(int entity) {
-		this.hasToBeFlushed = true;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void handleDeletedEntity(int entity) {
-		this.hasToBeFlushed = true;
-	}
-
-	/**
 	 * Returns a clone of the entities.
 	 *
 	 * @return the entites.
@@ -222,12 +227,8 @@ public class World implements EntityListener {
 	}
 
 	private void init() {
-		this.componentManager.onComponentAdded(entity -> {
-			if (!this.entityManager.entityExists(entity)) {
-				throw new IllegalArgumentException(ENTITY_DOES_NOT_EXIST_MSG);
-			}
-			this.hasToBeFlushed = true;
-		});
+		this.componentManager.setOnComponentAdded(event -> onComponentModification(event));
+		this.componentManager.setOnComponentRemoved(event -> onComponentModification(event));
 
 		for (BaseSystem system : this.systems) {
 			system.setWorld(this);
@@ -248,5 +249,13 @@ public class World implements EntityListener {
 			this.filteredSystemManager.updateAll();
 			this.hasToBeFlushed = false;
 		}
+	}
+
+	private void onComponentModification(ComponentEvent event) {
+		if (!this.entityManager.entityExists(event.getEntity())) {
+			throw new IllegalArgumentException(ENTITY_DOES_NOT_EXIST_MSG);
+		}
+
+		this.hasToBeFlushed = true;
 	}
 }

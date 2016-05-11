@@ -21,7 +21,7 @@
 
 package org.lomadriel.mentity;
 
-import org.lomadriel.lfc.event.EventDispatcher;
+import org.lomadriel.mentity.util.EventHandler;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -44,12 +44,23 @@ class EntityManager implements Serializable, Cloneable {
 	private transient int nextIndex;
 	private transient int tempNextIndex = Integer.MAX_VALUE;
 
+	private transient EventHandler<EntityEvent> onEntityCreated;
+	private transient EventHandler<EntityEvent> onEntityRemoved;
+
 	EntityManager() {
 		this.entities = new BitSet();
 	}
 
 	private EntityManager(EntityManager copy) {
 		this.entities = copy.entities;
+	}
+
+	void setOnEntityCreated(EventHandler<EntityEvent> eventHandler) {
+		this.onEntityCreated = eventHandler;
+	}
+
+	void setOnEntityRemoved(EventHandler<EntityEvent> eventHandler) {
+		this.onEntityRemoved = eventHandler;
 	}
 
 	/**
@@ -60,7 +71,10 @@ class EntityManager implements Serializable, Cloneable {
 	int createEntity() {
 		int entity = this.entities.nextClearBit(this.nextIndex);
 		this.entities.set(entity);
-		EventDispatcher.getInstance().fire(new EntityEvent(EntityEvent.Type.CREATED, entity));
+
+		if (this.onEntityCreated != null) {
+			this.onEntityCreated.handleEvent(new EntityEvent(EntityEvent.Type.CREATED, entity));
+		}
 
 		this.nextIndex = entity + 1;
 
@@ -84,7 +98,10 @@ class EntityManager implements Serializable, Cloneable {
 	 */
 	void destroyEntity(int entity) {
 		this.removeQueue.set(entity);
-		EventDispatcher.getInstance().fire(new EntityEvent(EntityEvent.Type.DESTROYED, entity));
+
+		if (this.onEntityRemoved != null) {
+			this.onEntityRemoved.handleEvent(new EntityEvent(EntityEvent.Type.DESTROYED, entity));
+		}
 
 		if (entity < this.tempNextIndex) {
 			this.tempNextIndex = entity;
