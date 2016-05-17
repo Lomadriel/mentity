@@ -72,10 +72,6 @@ public class ComponentManager implements Serializable, Cloneable {
 		ComponentMapper<T> mapper = (ComponentMapper<T>) this.mappers.get(componentClass);
 		if (mapper == null) {
 			mapper = new ComponentMapper<>(componentClass);
-
-			mapper.setOnComponentAdded(this.onComponentAdded);
-			mapper.setOnComponentRemoved(this.onComponentRemoved);
-
 			this.mappers.put(componentClass, mapper);
 		}
 
