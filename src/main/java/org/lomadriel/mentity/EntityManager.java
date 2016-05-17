@@ -37,6 +37,8 @@ import java.util.BitSet;
  */
 class EntityManager implements Serializable, Cloneable {
 	private static final long serialVersionUID = 2007045073473283304L;
+	private static final EventHandler<EntityEvent> DEFAULT_EVENT_HANDLER = event -> {
+	};
 
 	private final BitSet entities;
 	private final transient BitSet removeQueue = new BitSet();
@@ -44,8 +46,8 @@ class EntityManager implements Serializable, Cloneable {
 	private transient int nextIndex;
 	private transient int tempNextIndex = Integer.MAX_VALUE;
 
-	private transient EventHandler<EntityEvent> onEntityCreated;
-	private transient EventHandler<EntityEvent> onEntityRemoved;
+	private transient EventHandler<EntityEvent> onEntityCreated = DEFAULT_EVENT_HANDLER;
+	private transient EventHandler<EntityEvent> onEntityRemoved = DEFAULT_EVENT_HANDLER;
 
 	EntityManager() {
 		this.entities = new BitSet();
@@ -56,7 +58,11 @@ class EntityManager implements Serializable, Cloneable {
 	}
 
 	void setOnEntityCreated(EventHandler<EntityEvent> eventHandler) {
-		this.onEntityCreated = eventHandler;
+		if (this.onEntityCreated == null) {
+			this.onEntityCreated = DEFAULT_EVENT_HANDLER;
+		} else {
+			this.onEntityCreated = eventHandler;
+		}
 	}
 
 	void setOnEntityRemoved(EventHandler<EntityEvent> eventHandler) {
@@ -99,9 +105,7 @@ class EntityManager implements Serializable, Cloneable {
 	void destroyEntity(int entity) {
 		this.removeQueue.set(entity);
 
-		if (this.onEntityRemoved != null) {
-			this.onEntityRemoved.handleEvent(new EntityEvent(EntityEvent.Type.DESTROYED, entity));
-		}
+		this.onEntityRemoved.handleEvent(new EntityEvent(EntityEvent.Type.DESTROYED, entity));
 
 		if (entity < this.tempNextIndex) {
 			this.tempNextIndex = entity;

@@ -39,21 +39,23 @@ import java.util.BitSet;
  */
 public class ComponentMapper<T extends Component> implements Serializable {
 	private static final long serialVersionUID = 494271719946187185L;
+	private static final EventHandler<ComponentEvent> DEFAULT_EVENT_HANDLER = event -> {
+	};
 
 	private final Class<T> componentClass;
 	private final Bag<T> components;
 	private final transient BitSet componentsBitSet = new BitSet(); // No need to serialize this.
 	private final transient BitSet removeQueue = new BitSet();
 
-	private transient EventHandler<ComponentEvent> onComponentAdded;
-	private transient EventHandler<ComponentEvent> onComponentRemoved;
+	private transient EventHandler<ComponentEvent> onComponentAdded = DEFAULT_EVENT_HANDLER;
+	private transient EventHandler<ComponentEvent> onComponentRemoved = DEFAULT_EVENT_HANDLER;
 
 	ComponentMapper(Class<T> componentClass) {
 		this.componentClass = componentClass;
 		this.components = new Bag<>();
 	}
 
-	private ComponentMapper(ComponentMapper copy) {
+	private ComponentMapper(ComponentMapper<T> copy) {
 		this.componentClass = copy.componentClass;
 		this.components = copy.components;
 
@@ -65,11 +67,19 @@ public class ComponentMapper<T extends Component> implements Serializable {
 	}
 
 	void setOnComponentAdded(EventHandler<ComponentEvent> eventHandler) {
-		this.onComponentAdded = eventHandler;
+		if (eventHandler == null) {
+			this.onComponentAdded = DEFAULT_EVENT_HANDLER;
+		} else {
+			this.onComponentAdded = eventHandler;
+		}
 	}
 
 	void setOnComponentRemoved(EventHandler<ComponentEvent> eventHandler) {
-		this.onComponentRemoved = eventHandler;
+		if (eventHandler == null) {
+			this.onComponentRemoved = DEFAULT_EVENT_HANDLER;
+		} else {
+			this.onComponentRemoved = eventHandler;
+		}
 	}
 
 	/**
