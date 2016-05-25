@@ -78,7 +78,7 @@ public class WorldBuilder {
 	}
 
 	private static final Comparator<Node> NODE_COMPARATOR
-			= ((o1, o2) -> o1.priority.ordinal() - o2.priority.ordinal());
+			= ((o1, o2) -> o2.priority.ordinal() - o1.priority.ordinal());
 
 	private final Queue<Node> systems = new PriorityQueue<>(NODE_COMPARATOR);
 
