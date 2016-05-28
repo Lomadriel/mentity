@@ -172,6 +172,18 @@ public class World implements InternalEventListener {
 	}
 
 	/**
+	 * Returns true if the given entity has the component and the component isn't marked for deletion, false otherwise.
+	 *
+	 * @param entity         an entity.
+	 * @param componentClass component's class
+	 * @param <T>            component's class
+	 * @return true if the given entity has the component and the component isn't marked for deletion, false otherwise.
+	 */
+	public <T extends Component> boolean hasComponentAndWillKeepIt(int entity, Class<T> componentClass) {
+		return this.componentManager.hasComponentAndWillKeepIt(entity, componentClass);
+	}
+
+	/**
 	 * Removes the given {@code component} of the given {@code entity}.
 	 * <p>
 	 * The component is removed at the end of the iteration.
