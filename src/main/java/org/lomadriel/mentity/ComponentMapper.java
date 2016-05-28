@@ -28,7 +28,9 @@ import org.lomadriel.mentity.util.EventHandler;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
+import java.util.ArrayDeque;
 import java.util.BitSet;
+import java.util.Queue;
 
 /**
  * Class used to manage the components.
@@ -49,6 +51,8 @@ public class ComponentMapper<T extends Component> implements Serializable {
 
 	private transient EventHandler<ComponentEvent> onComponentAdded = DEFAULT_EVENT_HANDLER;
 	private transient EventHandler<ComponentEvent> onComponentRemoved = DEFAULT_EVENT_HANDLER;
+	private final transient Queue<Integer> componentAddedEvent = new ArrayDeque<>();
+	private final transient Queue<Integer> componentRemovedEvent = new ArrayDeque<>();
 
 	ComponentMapper(Class<T> componentClass) {
 		this.componentClass = componentClass;
@@ -90,6 +94,10 @@ public class ComponentMapper<T extends Component> implements Serializable {
 	 * @throws NullPointerException if the component is null.
 	 */
 	public void addComponent(int entity, T component) {
+		addComponent(entity, component, false);
+	}
+
+	void addComponent(int entity, T component, boolean delayEvent) {
 		assert (entity >= 0);
 
 		EventDispatcher.getInstance().fire(new InternalEvent(entity));
@@ -103,10 +111,14 @@ public class ComponentMapper<T extends Component> implements Serializable {
 		this.components.set(entity, component);
 		this.componentsBitSet.set(entity);
 
-		this.onComponentAdded.handleEvent(new ComponentEvent(this,
-				ComponentEvent.Type.ADDED,
-				this.componentClass,
-				entity));
+		if (delayEvent) {
+			this.componentAddedEvent.offer(entity);
+		} else {
+			this.onComponentAdded.handleEvent(new ComponentEvent(this,
+					ComponentEvent.Type.ADDED,
+					this.componentClass,
+					entity));
+		}
 	}
 
 	/**
@@ -141,16 +153,24 @@ public class ComponentMapper<T extends Component> implements Serializable {
 	 * @param entity an existing entity.
 	 */
 	public void removeComponent(int entity) {
+		removeComponent(entity, false);
+	}
+
+	void removeComponent(int entity, boolean delayEvent) {
 		assert (entity >= 0);
 
 		EventDispatcher.getInstance().fire(new InternalEvent(entity));
 
 		this.removeQueue.set(entity);
 
-		this.onComponentRemoved.handleEvent(new ComponentEvent(this,
-				ComponentEvent.Type.REMOVED,
-				this.componentClass,
-				entity));
+		if (delayEvent) {
+			this.componentRemovedEvent.offer(entity);
+		} else {
+			this.onComponentRemoved.handleEvent(new ComponentEvent(this,
+					ComponentEvent.Type.REMOVED,
+					this.componentClass,
+					entity));
+		}
 	}
 
 	/**
@@ -160,6 +180,27 @@ public class ComponentMapper<T extends Component> implements Serializable {
 	 */
 	public BitSet getEntitiesWithComponent() {
 		return this.componentsBitSet;
+	}
+
+	/**
+	 * Fires delayed event.
+	 */
+	void fireEvents() {
+		while (!this.componentAddedEvent.isEmpty()) {
+			int entity = this.componentAddedEvent.poll().intValue();
+			this.onComponentAdded.handleEvent(new ComponentEvent(this,
+					ComponentEvent.Type.ADDED,
+					this.componentClass,
+					entity));
+		}
+
+		while (!this.componentRemovedEvent.isEmpty()) {
+			int entity = this.componentRemovedEvent.poll().intValue();
+			this.onComponentRemoved.handleEvent(new ComponentEvent(this,
+					ComponentEvent.Type.REMOVED,
+					this.componentClass,
+					entity));
+		}
 	}
 
 	void flush() {
