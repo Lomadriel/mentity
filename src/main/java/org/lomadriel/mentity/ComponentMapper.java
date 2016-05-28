@@ -134,6 +134,18 @@ public class ComponentMapper<T extends Component> implements Serializable {
 	}
 
 	/**
+	 * Returns true if the given entity has the component and the component isn't marked for deletion, false otherwise.
+	 *
+	 * @param entity an entity.
+	 * @return true if the given entity has the component and the component isn't marked for deletion, false otherwise.
+	 */
+	public boolean hasComponentAndWillKeepIt(int entity) {
+		assert (entity >= 0);
+
+		return this.componentsBitSet.get(entity) && !this.removeQueue.get(entity);
+	}
+
+	/**
 	 * Returns the component of the given {@code entity}.
 	 *
 	 * @param entity an entity
