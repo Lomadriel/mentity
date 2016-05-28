@@ -67,7 +67,7 @@ public class ComponentManager implements Serializable, Cloneable {
 	 * @param <T>            class of the component.
 	 * @return a mapper
 	 */
-	public <T extends Component> ComponentMapper<T> getMapper(Class<T> componentClass) {
+	<T extends Component> ComponentMapper<T> getMapper(Class<T> componentClass) {
 		@SuppressWarnings("unchecked")
 		ComponentMapper<T> mapper = (ComponentMapper<T>) this.mappers.get(componentClass);
 		if (mapper == null) {
@@ -113,7 +113,7 @@ public class ComponentManager implements Serializable, Cloneable {
 	 * @param componentClass component's class
 	 * @param <T>            component's class
 	 */
-	public <T extends Component> void removeComponent(int entity, Class<T> componentClass) {
+	<T extends Component> void removeComponent(int entity, Class<T> componentClass) {
 		getMapper(componentClass).removeComponent(entity);
 	}
 
