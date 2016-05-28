@@ -90,7 +90,11 @@ public class ComponentManager implements Serializable, Cloneable {
 	 * @throws NullPointerException if the component is null.
 	 */
 	public <T extends Component> void addComponent(int entity, Class<T> componentClass, T component) {
-		getMapper(componentClass).addComponent(entity, component);
+		getMapper(componentClass).addComponent(entity, component, true);
+	}
+
+	<T extends Component> void addComponent(int entity, Class<T> componentClass, T component, boolean delayEvent) {
+		getMapper(componentClass).addComponent(entity, component, delayEvent);
 	}
 
 	/**
@@ -114,7 +118,11 @@ public class ComponentManager implements Serializable, Cloneable {
 	 * @param <T>            component's class
 	 */
 	<T extends Component> void removeComponent(int entity, Class<T> componentClass) {
-		getMapper(componentClass).removeComponent(entity);
+		getMapper(componentClass).removeComponent(entity, true);
+	}
+
+	<T extends Component> void removeComponent(int entity, Class<T> componentClass, boolean delayEvent) {
+		getMapper(componentClass).removeComponent(entity, delayEvent);
 	}
 
 	/**
@@ -134,6 +142,10 @@ public class ComponentManager implements Serializable, Cloneable {
 	 */
 	void reset() {
 		this.mappers.clear();
+	}
+
+	void fireEvents() {
+		this.mappers.values().forEach(ComponentMapper::fireEvents);
 	}
 
 	void flush() {

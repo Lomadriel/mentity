@@ -118,6 +118,7 @@ public class World implements InternalEventListener {
 		int entity = createEntity();
 
 		prefabs.initialize(this.componentManager, entity);
+		this.componentManager.fireEvents();
 
 		return entity;
 	}
@@ -154,7 +155,7 @@ public class World implements InternalEventListener {
 			throw new IllegalArgumentException(ENTITY_DOES_NOT_EXIST_MSG);
 		}
 
-		this.componentManager.addComponent(entity, componentClass, component);
+		this.componentManager.addComponent(entity, componentClass, component, false);
 		this.hasToBeFlushed = true;
 	}
 
@@ -186,7 +187,7 @@ public class World implements InternalEventListener {
 			throw new IllegalArgumentException(ENTITY_DOES_NOT_EXIST_MSG);
 		}
 
-		this.componentManager.removeComponent(entity, componentClass);
+		this.componentManager.removeComponent(entity, componentClass, false);
 		this.hasToBeFlushed = true;
 	}
 
