@@ -145,7 +145,10 @@ public class ComponentManager implements Serializable, Cloneable {
 	 */
 	void removeComponents(int entity) {
 		for (Class<? extends Component> componentClass : this.mappers.keySet()) {
-			getMapper(componentClass).removeComponent(entity);
+			ComponentMapper<?> mapper = getMapper(componentClass);
+			if (mapper.hasComponent(entity)) {
+				mapper.removeComponent(entity);
+			}
 		}
 	}
 
