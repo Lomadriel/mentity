@@ -93,11 +93,11 @@ public class ComponentMapper<T extends Component> implements Serializable {
 	 * @param component a component.
 	 * @throws NullPointerException if the component is null.
 	 */
-	public void addComponent(int entity, T component) {
+	public void addComponent(int entity, Component component) {
 		addComponent(entity, component, false);
 	}
 
-	void addComponent(int entity, T component, boolean delayEvent) {
+	void addComponent(int entity, Component component, boolean delayEvent) {
 		assert (entity >= 0);
 
 		EventDispatcher.getInstance().fire(new InternalEvent(entity));
@@ -108,7 +108,7 @@ public class ComponentMapper<T extends Component> implements Serializable {
 
 		component.entity = entity;
 
-		this.components.set(entity, component);
+		this.components.set(entity, (T) component);
 		this.componentsBitSet.set(entity);
 
 		if (delayEvent) {

@@ -219,7 +219,7 @@ public class World implements InternalEventListener {
 	 *
 	 * @return the mappers.
 	 */
-	public Set<ComponentMapper<?>> getMappers() {
+	public Set<ComponentMapper<? extends Component>> getMappers() {
 		return this.componentManager.getMappers();
 	}
 

@@ -87,7 +87,7 @@ public class ComponentManager implements Serializable, Cloneable {
 	 *
 	 * @return the mappers.
 	 */
-	Set<ComponentMapper<?>> getMappers() {
+	Set<ComponentMapper<? extends Component>> getMappers() {
 		return new HashSet<>(this.mappers.values());
 	}
 
@@ -100,11 +100,11 @@ public class ComponentManager implements Serializable, Cloneable {
 	 * @param <T>            type of the component.
 	 * @throws NullPointerException if the component is null.
 	 */
-	public <T extends Component> void addComponent(int entity, Class<T> componentClass, T component) {
+	public <T extends Component> void addComponent(int entity, Class<T> componentClass, Component component) {
 		getMapper(componentClass).addComponent(entity, component, true);
 	}
 
-	<T extends Component> void addComponent(int entity, Class<T> componentClass, T component, boolean delayEvent) {
+	<T extends Component> void addComponent(int entity, Class<T> componentClass, Component component, boolean delayEvent) {
 		getMapper(componentClass).addComponent(entity, component, delayEvent);
 	}
 
