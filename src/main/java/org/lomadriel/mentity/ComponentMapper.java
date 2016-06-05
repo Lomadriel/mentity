@@ -153,7 +153,9 @@ public class ComponentMapper<T extends Component> implements Serializable {
 	 */
 	public T getComponent(int entity) {
 		assert (entity >= 0);
-		assert (hasComponent(entity)) : "Useless call to getComponent(int entity)";
+		if (!hasComponent(entity)) {
+			System.out.println("Useless call to getComponent(int entity)");
+		}
 
 		return this.components.get(entity);
 	}
