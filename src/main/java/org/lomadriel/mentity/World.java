@@ -215,6 +215,15 @@ public class World implements InternalEventListener {
 	}
 
 	/**
+	 * Gets all mappers.
+	 *
+	 * @return the mappers.
+	 */
+	public Set<ComponentMapper<?>> getMappers() {
+		return this.componentManager.getMappers();
+	}
+
+	/**
 	 * Returns a clone of the entities.
 	 *
 	 * @return the entites.
