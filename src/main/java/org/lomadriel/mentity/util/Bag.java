@@ -75,10 +75,6 @@ public class Bag<E> implements Serializable {
 	 * @throws ArrayIndexOutOfBoundsException if index is negative.
 	 */
 	public void set(int index, E value) {
-		if (value == null) {
-			return;
-		}
-
 		if (index > this.highestElement) {
 			this.highestElement = index;
 
