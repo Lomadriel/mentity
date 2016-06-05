@@ -75,7 +75,7 @@ class EntityManager implements Serializable, Cloneable {
 	 * @return the new entity.
 	 */
 	int createEntity() {
-		int entity = this.entities.nextClearBit(this.nextIndex);
+		int entity = this.entities.nextClearBit(0);
 		this.entities.set(entity);
 
 		if (this.onEntityCreated != null) {
