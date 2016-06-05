@@ -25,7 +25,9 @@ import org.lomadriel.mentity.util.EventHandler;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Class used to manage the component mappers.
@@ -78,6 +80,15 @@ public class ComponentManager implements Serializable, Cloneable {
 		}
 
 		return mapper;
+	}
+
+	/**
+	 * Returns the mappers.
+	 *
+	 * @return the mappers.
+	 */
+	Set<ComponentMapper<?>> getMappers() {
+		return new HashSet<>(this.mappers.values());
 	}
 
 	/**
