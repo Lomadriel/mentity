@@ -194,6 +194,10 @@ public class ComponentMapper<T extends Component> implements Serializable {
 		return this.componentsBitSet;
 	}
 
+	public Class<? extends Component> getMapperClass() {
+		return this.componentClass;
+	}
+
 	/**
 	 * Fires delayed event.
 	 */
